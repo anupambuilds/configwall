@@ -1,0 +1,119 @@
+# Deploys both environments to GitHub Pages in one site:
+#   https://anupambuilds.github.io/configwall/test/  ← branch `main`        (test database)
+#   https://anupambuilds.github.io/configwall/       ← branch `production`  (production database)
+# Until a `production` branch exists, the public URL shows a "coming soon" page.
+# Launch / release = update the `production` branch (e.g. merge main into it).
+#
+# All values below are public by design (they ship inside the page).
+
+name: Deploy
+
+on:
+  push:
+    branches: [main, production]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+env:
+  SITE_ORIGIN: https://anupambuilds.github.io
+  TEST_SUPABASE_URL: https://gwgrxwgpovpswwqppexf.supabase.co
+  TEST_SUPABASE_KEY: sb_publishable_RExfQUuzHjifxZrnf5e5SA_vzX98sKL
+  PROD_SUPABASE_URL: https://olmdpakuiawvtiolbhne.supabase.co
+  PROD_SUPABASE_KEY: sb_publishable_Jryk56R_Yn1Fkiq8Kf_PBA_h1hGgj_A
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out main (test site)
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: main
+
+      - name: Check whether a production branch exists
+        id: prod
+        run: |
+          if git ls-remote --exit-code --heads "https://github.com/${{ github.repository }}.git" production >/dev/null; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check out production
+        if: steps.prod.outputs.exists == 'true'
+        uses: actions/checkout@v4
+        with:
+          ref: production
+          path: prod
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Build test site
+        working-directory: main
+        env:
+          NEXT_PUBLIC_APP_ENV: test
+          NEXT_PUBLIC_BASE_PATH: /configwall/test
+          NEXT_PUBLIC_SITE_URL: ${{ env.SITE_ORIGIN }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ env.TEST_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ env.TEST_SUPABASE_KEY }}
+        run: |
+          npm ci
+          npm run check:schema
+          npm run build
+
+      - name: Build production site
+        if: steps.prod.outputs.exists == 'true'
+        working-directory: prod
+        env:
+          NEXT_PUBLIC_APP_ENV: production
+          NEXT_PUBLIC_BASE_PATH: /configwall
+          NEXT_PUBLIC_SITE_URL: ${{ env.SITE_ORIGIN }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ env.PROD_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ env.PROD_SUPABASE_KEY }}
+        run: |
+          npm ci
+          npm run build
+
+      - name: Assemble site
+        run: |
+          mkdir -p site
+          if [ "${{ steps.prod.outputs.exists }}" = "true" ]; then
+            cp -r prod/out/. site/
+          else
+            cat > site/index.html <<'HTML'
+          <!doctype html>
+          <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+          <title>Config BLR Wall</title><meta name="robots" content="noindex">
+          <style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#f5f2ea;color:#161513;font:16px/1.5 system-ui,sans-serif;text-align:center;padding:24px}h1{font:400 48px/1 Georgia,serif;margin:0 0 12px}p{color:#6b665c;margin:0}</style>
+          </head><body><div><h1>Config BLR Wall</h1><p>Unofficial community recap wall. Coming soon.</p></div></body></html>
+          HTML
+          fi
+          mkdir -p site/test
+          cp -r main/out/. site/test/
+          # Next puts assets in _next/; without this file GitHub Pages (Jekyll) would hide them.
+          touch site/.nojekyll
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

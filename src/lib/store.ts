@@ -180,6 +180,9 @@ export function resetMockData() {
   } catch {}
 }
 
+/** Where data actually comes from in this build (shown in the non-production banner). */
+export const DATA_SOURCE: "mock" | "supabase" = "mock";
+
 let instance: Store | null = null;
 
 export function getStore(): Store {

@@ -220,8 +220,20 @@ Accounts or auth, comments, DMs, auto-pulling posts from X by hashtag, notificat
 ## 5. Tech requirements
 
 ### Project links
-- Code: https://github.com/anupambuilds/configwall (public). GitHub Pages URL will be `https://anupambuilds.github.io/configwall/`, so `NEXT_PUBLIC_BASE_PATH=/configwall`.
-- Supabase project ref: `olmdpakuiawvtiolbhne` (API: `https://olmdpakuiawvtiolbhne.supabase.co`).
+- Code: https://github.com/anupambuilds/configwall (public).
+
+### Environments
+| | Site | Supabase project | Deployed from |
+|---|---|---|---|
+| **Local** | `http://localhost:3000` | test (`gwgrxwgpovpswwqppexf`) via `.env.local` | your machine |
+| **Test** | `https://anupambuilds.github.io/configwall/test/` | test (`gwgrxwgpovpswwqppexf`) | every push to `main` |
+| **Production** | `https://anupambuilds.github.io/configwall/` | production (`olmdpakuiawvtiolbhne`, "Config Wall") | the `production` branch |
+
+- Both Supabase projects are in `ap-northeast-2` (Seoul) and have the same schema (`0001_init.sql` applied and verified on both).
+- Non-production builds show a yellow banner ("Test environment… / Local development") with the data source.
+- **Until a `production` branch exists, the public URL shows a "coming soon" page.** Launch or release = update the `production` branch (merge `main` into it).
+- One GitHub Actions workflow (`.github/workflows/deploy.yml`) builds both sites into one GitHub Pages deployment; it runs `check:schema` on every build.
+- Only public values (project URLs, publishable keys) are in the repo. Secret keys and database passwords stay in Supabase / a git-ignored local file.
 
 ### Hosting: GitHub Pages (static)
 - **Next.js 16 (App Router) + TypeScript + Tailwind v4**, built with `output: "export"` into `out/`.
@@ -268,7 +280,7 @@ Everything the frontend collects has a column. `npm run check:schema` fails if a
 Links are canonicalised before saving: X → `https://x.com/{handle}/status/{id}`; LinkedIn → https, no query.
 
 ### Backend (Supabase): to build
-- **Migration ready:** `supabase/migrations/0001_init.sql` (tables, per-type check constraints mirroring the form rules, RLS, column grants hiding `device_id`, `upvote`/`my_votes` RPCs, realtime publication, `photos` bucket). Not yet run against a real database.
+- **Migration applied** to both projects: `supabase/migrations/0001_init.sql` (tables, per-type check constraints mirroring the form rules, RLS, column grants hiding `device_id`, `upvote`/`my_votes` RPCs, realtime publication, `photos` bucket). Verified with the public key: reads visible posts only; cannot insert, read votes or see `device_id`; one upvote per device; hidden posts disappear; invalid data is rejected by the database.
 ```sql
 posts (
   id uuid pk default gen_random_uuid(),
@@ -342,6 +354,13 @@ votes (post_id uuid references posts, device_id text, primary key (post_id, devi
 ## 7. Change log
 
 Newest first. The sections above always describe the current product; this log records what changed and why.
+
+### 2026-10-15 — Supabase set up; test environment
+- Applied the schema to the production project and verified it end to end with the public key (then removed the test data).
+- Created a separate **test** Supabase project (`configwall-test`, `gwgrxwgpovpswwqppexf`) with the same schema.
+- Added environments: local and the hosted **test site** (`/configwall/test/`, from `main`) use the test database; **production** (`/configwall/`) deploys only from a `production` branch, and shows "coming soon" until then.
+- GitHub Actions workflow for GitHub Pages; yellow environment banner on non-production builds.
+- The app still runs on mock data; the Supabase data layer is next.
 
 ### 2026-10-15 — Add card on person pages
 - The Activity section of every person page now starts with the **Add to the wall** card (opens the type picker). The add card is now a shared component used by the feed and People.

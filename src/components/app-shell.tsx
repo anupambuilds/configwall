@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { APP_ENV } from "@/lib/config";
+import { DATA_SOURCE } from "@/lib/store";
 import type { PostKind, PostType } from "@/lib/types";
 import { cx } from "@/lib/util";
 import { AddPostSheet } from "./add-post-sheet";
@@ -54,6 +56,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <ShellContext.Provider value={{ openAdd, toast }}>
+      {APP_ENV !== "production" && (
+        <div className="bg-[#fde68a] px-4 py-1.5 text-center text-xs font-medium text-ink">
+          {APP_ENV === "test" ? "Test environment: data here is for testing and may be wiped." : "Local development"}
+          {DATA_SOURCE === "supabase" ? " · test database" : " · mock data in this browser"}
+        </div>
+      )}
       <nav className="sticky top-0 z-30 border-b border-line/80 bg-paper/85 backdrop-blur-md">
         <div className="mx-auto flex h-14 max-w-6xl items-center gap-3 px-4">
           <Link href="/" className="shrink-0 font-serif text-lg leading-none tracking-tight sm:text-xl">

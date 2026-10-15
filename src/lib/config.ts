@@ -20,6 +20,21 @@ export const BUILDER_HANDLE = process.env.NEXT_PUBLIC_BUILDER_HANDLE || "yourhan
 
 export const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || "";
 
+/**
+ * Which environment this build is. "local" = your machine, "test" = the
+ * hosted test site (test database), "production" = the public site.
+ */
+export type AppEnv = "local" | "test" | "production";
+export const APP_ENV: AppEnv = (["test", "production"] as const).find((e) => e === process.env.NEXT_PUBLIC_APP_ENV) ?? "local";
+
+/**
+ * Supabase project for this build. Both values are public by design (they
+ * ship in the page); the database's access rules limit what they can do.
+ * Unset → the app runs on local mock data.
+ */
+export const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+export const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || "";
+
 // Local-only admin gate. On a static site this is NOT real security — the
 // backend (Supabase RLS / edge function) must enforce admin rights.
 export const ADMIN_KEY = process.env.NEXT_PUBLIC_ADMIN_KEY || "local-admin";

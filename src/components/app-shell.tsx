@@ -48,8 +48,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   useEffect(() => () => clearTimeout(timer.current), []);
 
   const isAdmin = pathname?.startsWith("/admin");
-  // The feed has its own "Add" cards; other pages get a nav button.
-  const showNavAdd = !isAdmin && pathname !== "/";
+  // The feed has its own "Add" cards and People is for browsing; other pages get a nav button.
+  const showNavAdd = !isAdmin && pathname !== "/" && !pathname?.startsWith("/people");
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname?.startsWith(href.replace(/\/$/, "")));
 
   return (

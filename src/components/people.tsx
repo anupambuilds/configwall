@@ -10,7 +10,7 @@ import { useMyVotes, usePosts } from "@/lib/use-posts";
 import { cx, normalizeHandle, timeAgo } from "@/lib/util";
 import { useShell } from "./app-shell";
 import { ConfigCardPanel, personPosts } from "./config-card";
-import { XLogo } from "./icons";
+import { CardIcon, XLogo } from "./icons";
 import { Masonry } from "./masonry";
 import { Avatar, PostCard } from "./post-card";
 
@@ -135,8 +135,13 @@ function PersonRow({ person: p, isMe, onOpenCard }: { person: Person; isMe: bool
           </span>
         </span>
       </Link>
-      <button onClick={onOpenCard} className="shrink-0 rounded-full border border-line bg-surface px-3 py-1.5 text-sm font-medium transition-colors hover:bg-ink/5">
-        Config card
+      <button
+        onClick={onOpenCard}
+        aria-label={`Config card for ${displayName(p)}`}
+        title="Config card"
+        className="grid size-10 shrink-0 place-items-center rounded-full border border-line bg-surface text-ink transition-colors hover:bg-ink/5"
+      >
+        <CardIcon className="size-5" />
       </button>
     </li>
   );
@@ -247,8 +252,8 @@ function PersonDetail({
         </div>
         <div className="flex flex-wrap gap-2">
           {person && (
-            <button onClick={() => onOpenCard(person.key)} className="rounded-full bg-ink px-4 py-2 text-sm font-semibold text-paper">
-              Config card
+            <button onClick={() => onOpenCard(person.key)} aria-label="Config card" title="Config card" className="grid size-10 place-items-center rounded-full bg-ink text-paper">
+              <CardIcon className="size-5" />
             </button>
           )}
           {person?.handle && (

@@ -16,12 +16,13 @@ The app currently runs on **mock data** stored in your browser (localStorage). O
 - Admin: `http://localhost:3000/admin/?key=local-admin`. Use "Reset mock data" there to start over.
 - Talk list and builder handle: `src/lib/config.ts`. Mock seed posts: `src/lib/mock-seed.ts`.
 - All data access goes through `src/lib/store.ts`. The Supabase backend plugs in there.
+- Database schema: `supabase/migrations/0001_init.sql`. Run `npm run check:schema` to confirm every field the UI collects has a column.
 
 ## Env vars (optional)
 
 | Var | Purpose |
 |---|---|
 | `NEXT_PUBLIC_BASE_PATH` | `/repo-name` when deployed as a GitHub Pages project site |
-| `NEXT_PUBLIC_SITE_URL` | Public origin used in share links and the card footer |
+| `NEXT_PUBLIC_SITE_URL` | Public origin used in share links and the Config card footer |
 | `NEXT_PUBLIC_BUILDER_HANDLE` | Your X handle for the "built by" credit |
 | `NEXT_PUBLIC_ADMIN_KEY` | Local admin gate (not real security on a static site) |

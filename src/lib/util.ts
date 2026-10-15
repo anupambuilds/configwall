@@ -33,14 +33,21 @@ export function linkKind(url: string | null): LinkKind | null {
   return null;
 }
 
-/** twitter.com → x.com, strip tracking params. */
+/**
+ * Canonical links, matching the database checks:
+ * X status → https://x.com/{handle}/status/{id} (twitter.com, /photo/1, query and hash dropped);
+ * everything else → https, no query or hash.
+ */
 export function normalizeLink(url: string): string {
   try {
     const u = new URL(url.trim());
     if (linkKind(u.href) === "x") {
+      const m = u.pathname.match(/^\/([A-Za-z0-9_]{1,15})\/status(?:es)?\/(\d+)/);
+      if (m) return `https://x.com/${m[1]}/status/${m[2]}`;
       u.hostname = "x.com";
-      u.search = "";
     }
+    u.protocol = "https:";
+    u.search = "";
     u.hash = "";
     return u.href;
   } catch {

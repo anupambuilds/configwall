@@ -60,7 +60,7 @@ The builder was not at the event, so the product is **online-first**: it pulls t
   - Posts → opens the Post form, with the type pre-selected if a sub-filter is active ("Add a quote").
   - People we met → opens the met form. Talk notes → opens the notes form, with the talk pre-selected if one is filtered.
 - **Empty state per tab** with a matching CTA ("Share your X post", "Add someone you met", "Add notes from a talk").
-- **Other pages** (People directory, single entry) have a **"+ Add"** button in the top nav instead. The card page has none. The floating "Add to the wall" button is gone.
+- **The single-entry page** (`/p/`) has a **"+ Add"** button in the top nav. The People page has none. The floating "Add to the wall" button is gone.
 
 ### 3.2 Card designs
 Two card families. **Every field entered at creation appears on the card.**
@@ -135,11 +135,12 @@ Everyone engaging with the wall, with their metrics. **No leaderboard:** no rank
 - One row per person: initials avatar, name, @handle, designation at company, and metrics: **posts · met · upvotes · active Xm ago**. A "You" badge marks your own row.
 - **Search** by name or @handle, instant and case-insensitive (`@` optional), with a "N of M people" count.
 - **Order:** most recently active first.
-- Each row opens the person's activity; a **Config card** button on the row opens their card in a side panel.
+- Each row opens the person's activity; a **card icon** button on the row (tooltip "Config card") opens their card in a side panel.
+- No add button on the People page (it's for browsing).
 - **"You met N people"** panel at the top (when your handle is saved on this device): chips for each person, **Copy list** and **Download CSV** (`name, role, company, x_handle, x_url, linkedin, talked_about, logged_at`).
 
 **Person view** (`/people/?p=x:handle`, or the `?h=handle` shortcut)
-- Name, @handle, designation at company; **Config card**, X profile and LinkedIn buttons.
+- Name, @handle, designation at company; **card icon** (Config card), X profile and LinkedIn buttons.
 - Metric tiles: Posts, People met, Upvotes.
 - "Met" chips linking to each connection.
 - **Activity:** everything they posted, plus met cards about them, newest first.
@@ -242,7 +243,28 @@ Accounts or auth, comments, DMs, auto-pulling posts from X by hashtag, notificat
 - When an X link is added, `resolveTweet(url)` returns `{ id, url, text, author_name, author_handle, author_avatar, created_at, photos[], mentions[] }`, stored on the post.
 - Backend: an Edge Function calls X's public syndication endpoint (the one `react-tweet` uses). It's unofficial, so it may break or be rate-limited. If it fails, the post is saved without a snapshot and renders with the official embed. Photos should be copied to our storage so cards still work if the tweet is deleted.
 
+### Data captured (and where it lives once live)
+Everything the frontend collects has a column. `npm run check:schema` fails if a `Post` field is missing from the contract (`src/lib/db.ts`) or from the migration.
+
+| Collected in the UI | Stored as |
+|---|---|
+| Entry type, post type, source (X / wall) | `posts.type`, `kind`, `source` |
+| Wall post text, met conversation, talk notes | `posts.body` |
+| X link + fetched tweet (text, photos, author, avatar, mentions, date) | `posts.link_url`, `posts.tweet` (jsonb), `posts.tweet_id` (dedupe, DB-only) |
+| Tagged people on wall posts | `posts.tagged` (text[]) |
+| Person met: name, designation, company, X handle, LinkedIn | `posts.met_name`, `met_role`, `met_company`, `met_handle`, `met_linkedin` |
+| Met photos (up to 4) | Storage bucket `photos` → URLs in `posts.photos` |
+| Talk (for notes) | `posts.talk` |
+| Your X handle | `posts.author_handle` (also remembered in the browser) |
+| Upvotes | `votes(post_id, device_id)` + `posts.upvotes` |
+| Device id | `votes.device_id`, `posts.device_id` (DB-only: rate limits, moderation) |
+| Admin: hide / seed | `posts.hidden`, `posts.is_seed` |
+| People, connections, metrics, last active | Computed from `posts`; not stored separately, so never out of sync |
+
+Links are canonicalised before saving: X → `https://x.com/{handle}/status/{id}`; LinkedIn → https, no query.
+
 ### Backend (Supabase): to build
+- **Migration ready:** `supabase/migrations/0001_init.sql` (tables, per-type check constraints mirroring the form rules, RLS, column grants hiding `device_id`, `upvote`/`my_votes` RPCs, realtime publication, `photos` bucket). Not yet run against a real database.
 ```sql
 posts (
   id uuid pk default gen_random_uuid(),
@@ -317,6 +339,12 @@ votes (post_id uuid references posts, device_id text, primary key (post_id, devi
 ## 7. Change log
 
 Newest first. The sections above always describe the current product; this log records what changed and why.
+
+### 2026-10-15 — Card icon, no add on People, data contract + migration
+- People rows and the person view use a **card icon** for the Config card instead of the text label.
+- Removed the "+ Add" nav button from the People page.
+- Added the **data contract** (`src/lib/db.ts`), the first **Supabase migration** (`supabase/migrations/0001_init.sql`) and `npm run check:schema`, which fails if any field the frontend collects has no column.
+- Links are canonicalised (X status URLs → `https://x.com/{handle}/status/{id}`; LinkedIn → https without query) so they always pass the database checks.
 
 ### 2026-10-15 — People directory + Config card side panel; card page removed
 - **Removed the standalone card page** (`/card/`) and the "My card" nav link.

@@ -1,3 +1,14 @@
+/** A small portrait card with a profile and lines — the "Config card". */
+export function CardIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <rect x="5" y="2.5" width="14" height="19" rx="2.5" />
+      <circle cx="12" cy="9" r="2.6" />
+      <path d="M8.5 15h7M9.5 18h5" />
+    </svg>
+  );
+}
+
 export function XLogo({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden>

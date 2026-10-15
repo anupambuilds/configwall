@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "dev:clean": "node -e \"require('fs').rmSync('.next/dev',{recursive:true,force:true})\" && next dev"
+    "dev:clean": "node -e \"require('fs').rmSync('.next/dev',{recursive:true,force:true})\" && next dev",
+    "check:schema": "node scripts/check-schema.mjs"
   },
   "dependencies": {
     "html-to-image": "^1.11.13",

@@ -53,7 +53,7 @@ The builder was not at the event, so the product is **online-first**: it pulls t
   - **Talk notes**: a mixed feed of all notes by default. A talk dropdown (default **All talks**) and a **Group by talk** toggle, which shows notes under each talk in schedule order; each group heading has the note count and "+ Add notes".
 - **Toolbar:** tabs and **Latest / Top** sit on one row (sort right-aligned; tabs scroll on small screens). The second row only appears for Posts (type sub-filters) and Talk notes (talk dropdown + Group by talk).
 - Everything lives in the URL (`?tab=posts&kind=quote&sort=top`, `?tab=notes&talk=…&group=talk`), so any view is shareable.
-- **Masonry grid:** 1 column under 480px, 2 on large phones and tablets, 3–4 on desktop. Shortest-column-first placement keeps the reading order roughly chronological.
+- **Masonry grid:** 1 column under 640px (phones), 2 from 640px (tablets), **3 max** from 1024px (desktop), so every card, especially embedded X posts, gets enough room. Shortest-column-first placement keeps the reading order roughly chronological.
 - **Realtime:** other people's posts wait behind a "↑ N new posts" pill; your own appear immediately and animate in.
 - **Add card:** the first card on every tab is a small dashed "+" card.
   - All → "Add to the wall", which opens the type picker (Post / Someone I met / Talk notes).
@@ -360,6 +360,9 @@ votes (post_id uuid references posts, device_id text, primary key (post_id, devi
 ## 7. Change log
 
 Newest first. The sections above always describe the current product; this log records what changed and why.
+
+### 2026-10-15 — Max 3 columns
+- The feed (and person activity) now caps at **3 columns** on desktop (was 4), with 2 columns from 640px and 1 below. Cards get ~290–330px of content width on desktop, so embedded tweets are no longer cramped.
 
 ### 2026-10-15 — Embedded X posts respect the card padding
 - X’s embed has a ~250px minimum width set inline, wider than a card’s content area in 3–4 column layouts, so it overflowed and hid the right padding. The embed is now forced to the card’s content width (and clipped if X still renders wider), keeping 16px padding on both sides.

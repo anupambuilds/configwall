@@ -3,12 +3,11 @@
 import { useEffect, useState } from "react";
 import type { Post } from "@/lib/types";
 
-// X embeds need ~250px to render, so phones get a single column below 480px.
+// Max 3 columns: every card (especially embedded X posts, which want ≥250px) gets enough room.
 function columnsFor(width: number): number {
-  if (width < 480) return 1;
-  if (width < 900) return 2;
-  if (width < 1200) return 3;
-  return 4;
+  if (width < 640) return 1;
+  if (width < 1024) return 2;
+  return 3;
 }
 
 function useColumnCount(): number {

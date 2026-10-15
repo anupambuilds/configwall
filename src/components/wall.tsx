@@ -273,7 +273,7 @@ function EmptyState({ tab, talk, onAdd }: { tab: TabKey; talk: string; onAdd: ()
 
 function SkeletonGrid() {
   return (
-    <div className="grid grid-cols-1 gap-4 min-[480px]:grid-cols-2 min-[900px]:grid-cols-3" aria-busy>
+    <div className="grid grid-cols-1 gap-4 min-[640px]:grid-cols-2 min-[1024px]:grid-cols-3" aria-busy>
       {[180, 260, 140, 220, 300, 160].map((h, i) => (
         <div key={i} className="animate-pulse rounded-2xl border border-line bg-card" style={{ height: h }} />
       ))}

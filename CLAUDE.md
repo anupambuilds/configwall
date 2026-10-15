@@ -111,6 +111,7 @@ One table, `posts`, with `type` ∈ `post | met | note`. People, connections and
 Changing the model? Update `types.ts`, `EMPTY_POST`, `db.ts`, a **new** migration in `supabase/migrations/` (applied to test, then production), `validatePost`, the mock seed, and `product.md`. `npm run check:schema` must pass.
 
 ## UI conventions
+- Grid: 1 column < 640px, 2 columns < 1024px, max 3 columns (embedded X posts need ≥250px).
 - Feed tabs: All · Posts (sub-filters by kind) · People we met · Talk notes (mixed by default, optional "Group by talk"). Latest/Top on the tab row. The first card on each tab is a dashed **Add card**.
 - Counters show exact numbers up to 100, then `100+`, `150+`, … (`formatCount`).
 - Primary colour near-black `#1c1b19` on off-white `#f5f2ea`; green "Live" dot; add cards tint grey on hover.

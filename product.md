@@ -120,13 +120,9 @@ Required: name **or** X handle **or** LinkedIn, plus the conversation and your h
 - Required-field validation, character counters, and a basic profanity / link-spam check.
 - twitter.com links are normalised to x.com.
 
-**Success screen (wall → X)**
-- For wall posts, met and talk notes: **Post on 𝕏** opens X with text already filled in, a link back to the entry on the wall, and the hashtag.
-  - Post: *the text … with @tagged*
-  - Met: *Met Priya (@priya), Design Lead at Acme, at Config BLR. Talked about … → link*. Tags them, which is the main growth loop.
-  - Talk notes: *My notes from "Talk" at Config BLR: … → link*
-  - If the met card has photos: "X doesn't let us attach photos; add them in the X composer."
-- For all: **Make your card** (opens your Config card on the People page), **Done**.
+**After posting**
+- The sheet closes, a toast says **"Post is being added to the wall"**, and you're taken to the wall (the feed, scrolled to the top, where your post appears). No success screen.
+- Posting to X happens from the card itself: every wall post, met card and talk note has a 𝕏 button that opens X with the text pre-filled, a link back to the entry, the hashtag, and (for met cards) the person tagged.
 
 ### 3.4 People — `/people/`
 Everyone engaging with the wall, with their metrics. **No leaderboard:** no ranks, no sorting by score.
@@ -354,6 +350,9 @@ votes (post_id uuid references posts, device_id text, primary key (post_id, devi
 ## 7. Change log
 
 Newest first. The sections above always describe the current product; this log records what changed and why.
+
+### 2026-10-15 — No success modal after posting
+- Submitting any post now closes the sheet, shows "Post is being added to the wall" and takes you to the wall. The success screen (Post on X / Make your card / Done) is removed; the 𝕏 button on each card still posts it to X.
 
 ### 2026-10-15 — Supabase set up; test environment
 - Applied the schema to the production project and verified it end to end with the public key (then removed the test data).

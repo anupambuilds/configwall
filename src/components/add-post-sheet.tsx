@@ -1,11 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { MAX_BODY, MAX_LONG, TALKS } from "@/lib/config";
 import { getMyHandle, setMyHandle } from "@/lib/identity";
 import { compressImage } from "@/lib/image";
-import { postToXUrl } from "@/lib/share";
 import { getStore } from "@/lib/store";
 import { EMPTY_POST, KIND_LABELS, MAX_MET_PHOTOS, POST_KINDS, type NewPost, type Post, type PostKind, type PostType, type TweetSnapshot } from "@/lib/types";
 import { cx, handleFromXUrl, linkKind, normalizeHandle, normalizeLink, parseHandles, validatePost } from "@/lib/util";
@@ -22,14 +20,15 @@ export function AddPostSheet({
   initialTalk,
   initialKind,
   onClose,
+  onPosted,
 }: {
   initialType?: PostType;
   initialTalk?: string;
   initialKind?: PostKind;
   onClose: () => void;
+  onPosted: (post: Post) => void;
 }) {
   const [type, setType] = useState<PostType | null>(initialType ?? null);
-  const [posted, setPosted] = useState<Post | null>(null);
   const close = useEffectEvent(onClose);
 
   useEffect(() => {
@@ -50,21 +49,19 @@ export function AddPostSheet({
       <div className="animate-fade-in absolute inset-0 bg-black/50" onClick={onClose} />
       <div className="animate-sheet-up relative flex max-h-[92dvh] w-full max-w-lg flex-col rounded-t-3xl bg-card shadow-2xl sm:rounded-3xl">
         <div className="flex items-center gap-2 px-5 pt-5 pb-3">
-          {type && !posted && (
+          {type && (
             <button onClick={() => setType(null)} className="-ml-2 grid size-9 place-items-center rounded-full text-muted hover:bg-paper" aria-label="Back">
               ←
             </button>
           )}
-          <h2 className="flex-1 font-serif text-2xl">{posted ? "On the wall" : section?.label ?? "Add to the wall"}</h2>
+          <h2 className="flex-1 font-serif text-2xl">{section?.label ?? "Add to the wall"}</h2>
           <button onClick={onClose} className="grid size-9 place-items-center rounded-full text-muted hover:bg-paper" aria-label="Close">
             ✕
           </button>
         </div>
 
         <div className="overflow-y-auto px-5 pb-5">
-          {posted ? (
-            <Success post={posted} onClose={onClose} />
-          ) : !type ? (
+          {!type ? (
             <div className="flex flex-col gap-2">
               {SECTIONS.map((s) => (
                 <button key={s.type} onClick={() => setType(s.type)} className="flex items-center gap-4 rounded-2xl border border-line bg-paper/60 p-4 text-left transition-colors hover:border-ink/40">
@@ -79,11 +76,11 @@ export function AddPostSheet({
               ))}
             </div>
           ) : type === "post" ? (
-            <PostForm initialKind={initialKind} onPosted={setPosted} />
+            <PostForm initialKind={initialKind} onPosted={onPosted} />
           ) : type === "met" ? (
-            <MetForm onPosted={setPosted} />
+            <MetForm onPosted={onPosted} />
           ) : (
-            <NoteForm initialTalk={initialTalk} onPosted={setPosted} />
+            <NoteForm initialTalk={initialTalk} onPosted={onPosted} />
           )}
         </div>
       </div>
@@ -450,34 +447,6 @@ function NoteForm({ initialTalk, onPosted }: { initialTalk?: string; onPosted: (
 }
 
 // ---------------------------------------------------------------------------
-
-function Success({ post, onClose }: { post: Post; onClose: () => void }) {
-  const fromX = post.type === "post" && post.source === "x";
-  return (
-    <div className="flex flex-col gap-3 pb-1">
-      <p className="text-muted">
-        {fromX
-          ? "Your post is on the wall. Make a card with everything you've shared."
-          : "Want more people to see it? Post it on X too. It links back to the wall" +
-            (post.type === "met" && post.met_handle ? ` and tags @${post.met_handle}.` : ".")}
-      </p>
-      {!fromX && (
-        <a href={postToXUrl(post)} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 rounded-full bg-ink py-3.5 font-semibold text-paper">
-          Post on <XLogo className="size-4" />
-        </a>
-      )}
-      {post.type === "met" && post.photos.length > 0 && <p className="-mt-1 text-center text-xs text-muted">X doesn&apos;t let us attach photos; add them in the X composer.</p>}
-      {post.author_handle && (
-        <Link href={`/people/?card=${encodeURIComponent(`x:${post.author_handle}`)}`} onClick={onClose} className={cx("rounded-full py-3.5 text-center font-semibold", fromX ? "bg-ink text-paper" : "border border-ink")}>
-          Make your card
-        </Link>
-      )}
-      <button onClick={onClose} className="py-2 text-sm text-muted hover:text-ink">
-        Done
-      </button>
-    </div>
-  );
-}
 
 function FormFooter({ error, busy }: { error: string | null; busy: boolean }) {
   return (

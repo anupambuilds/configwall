@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { APP_ENV } from "@/lib/config";
 import { DATA_SOURCE } from "@/lib/store";
@@ -35,6 +35,7 @@ const NAV = [
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [sheet, setSheet] = useState<{ type?: PostType; talk?: string; kind?: PostKind } | null>(null);
   const [toastMsg, setToastMsg] = useState<ToastMsg | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -124,6 +125,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           initialTalk={sheet.talk}
           initialKind={sheet.kind}
           onClose={() => setSheet(null)}
+          onPosted={() => {
+            setSheet(null);
+            toast("Post is being added to the wall");
+            // Show the wall: go to the feed (or stay on it) and scroll to the top, where new posts appear.
+            if (pathname !== "/") router.push("/");
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }}
         />
       )}
     </ShellContext.Provider>

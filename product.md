@@ -1,0 +1,399 @@
+# Config BLR Wall — Product Requirements
+
+> Unofficial, community-built recap wall for Figma Config Bangalore.
+> Status: **frontend wireframe running locally on mock data**; backend not started.
+
+---
+
+## 1. What this is
+
+A live, public **feed** of what people took away from Config Bangalore. It has three kinds of entry:
+
+- **Posts**: X-first. Mostly real X posts pulled onto the wall and shown as faithful tweet cards. People can also write a post here and push it to X.
+- **People we met**: who you met, who they are, how to find them, and what you talked about. **This is the most valuable part of the product.**
+- **Talk notes**: notes from a specific talk.
+
+It works in both directions: X posts come onto the wall, and anything written on the wall can be posted to X in one tap.
+
+The builder was not at the event, so the product is **online-first**: it pulls the conversation already happening on X into one place and lets attendees add to it directly. No login. Every entry credits its author.
+
+### Why
+
+- Remote designers want the highlights without scrolling X for hours.
+- Attendees want to share what they learned and who they met, and get a shareable artifact out of it.
+- The builder wants to show fast product/design execution and become visible in the Bangalore design community.
+
+### Ground rules
+
+- **Unofficial.** No Figma or Config logos, colours or branding. "Unofficial" is visible in the header and on the share card.
+- **Credit everyone.** Every entry shows an author handle (or "Anonymous"). Shared posts link to the original tweet.
+- **Never invent content.** Seeds are real, credited posts. Mock data exists only for local development and uses obvious `demo_` handles.
+
+---
+
+## 2. Users
+
+| User | Wants | Primary screens |
+|---|---|---|
+| **Attendee** | Bring their X posts in, log who they met, share talk notes, get a Config card to post | Feed, Add, People |
+| **Remote designer** | Skim the best of the day, read notes per talk | Feed (Top sort), single post |
+| **Admin (builder)** | Seed content before launch, remove spam | Admin |
+
+---
+
+## 3. Features
+
+### 3.1 Feed — `/`
+- Header: title, "What Bangalore designers took away from Config: the posts, the people, the talk notes. Unofficial, built by @handle", live counter (`N posts · M people`).
+- **Counters** (tab counts and the header’s posts/people): exact up to 100, then rounded down in steps of 50: 100+, 150+, 200+, 250+…
+- **Tabs** (each with a count): **All** · **Posts** · **People we met** · **Talk notes**.
+  - **All**: everything mixed, newest first. No filters.
+  - **Posts**: sub-filters **All posts · Takeaways · Quotes · Stories · Photos · Reviews**. "Takeaway" is just a post type.
+  - **People we met**: only met cards.
+  - **Talk notes**: a mixed feed of all notes by default. A talk dropdown (default **All talks**) and a **Group by talk** toggle, which shows notes under each talk in schedule order; each group heading has the note count and "+ Add notes".
+- **Toolbar:** tabs and **Latest / Top** sit on one row (sort right-aligned; tabs scroll on small screens). The second row only appears for Posts (type sub-filters) and Talk notes (talk dropdown + Group by talk).
+- Everything lives in the URL (`?tab=posts&kind=quote&sort=top`, `?tab=notes&talk=…&group=talk`), so any view is shareable.
+- **Masonry grid:** 1 column under 480px, 2 on large phones and tablets, 3–4 on desktop. Shortest-column-first placement keeps the reading order roughly chronological.
+- **Realtime:** other people's posts wait behind a "↑ N new posts" pill; your own appear immediately and animate in.
+- **Add card:** the first card on every tab is a small dashed "+" card.
+  - All → "Add to the wall", which opens the type picker (Post / Someone I met / Talk notes).
+  - Posts → opens the Post form, with the type pre-selected if a sub-filter is active ("Add a quote").
+  - People we met → opens the met form. Talk notes → opens the notes form, with the talk pre-selected if one is filtered.
+- **Empty state per tab** with a matching CTA ("Share your X post", "Add someone you met", "Add notes from a talk").
+- **Other pages** (People directory, single entry) have a **"+ Add"** button in the top nav instead. The card page has none. The floating "Add to the wall" button is gone.
+
+### 3.2 Card designs
+Two card families. **Every field entered at creation appears on the card.**
+
+**Post card**: one design for every post, whether from X or written on the wall.
+- Header: avatar, name, @handle, time. Top-right: the **X logo** (links to the tweet) for X posts, or a **"Wall post"** label for native posts.
+- **Type tag** (Takeaway / Quote / Story / Photo / Review), colour per type; Review is grey.
+- Text with @mentions, #hashtags and links styled like X (quotes in large serif), a 1–4 photo grid like X's, "Tagged" people chips.
+- Footer: **View on X ↗** (X posts only), then engagement: 𝕏 post-to-X (wall posts only), copy link, upvote.
+- If the tweet's saved copy isn't available, the body falls back to X's official embed, lazy-loaded, still with the type tag and footer.
+
+**Editorial card**: same layout in two colours.
+
+| | People we met (purple) | Talk notes (yellow) |
+|---|---|---|
+| Pill | PEOPLE WE MET | TALK NOTES |
+| Headline (serif) | **@you met Priya** | the talk name |
+| Sections (dashed dividers) | **Who Priya is**: designation at company, X and LinkedIn chips · **What we discussed** (expands after 5 lines) · **Photos** (1–4, X-style grid) | the notes (expand after 7 lines) |
+| Footer | time, 𝕏, copy link, upvote | @author, time, 𝕏, copy link, upvote |
+
+### 3.3 Add to the wall
+Step 1 picks one of **three** sections, step 2 is a short form, step 3 is a success screen.
+
+**① Post** (X-first). Two modes, defaulting to the first:
+
+| Mode | Fields | Required |
+|---|---|---|
+| **Paste an X link** | X post URL → the post is fetched and previewed; the author handle is **auto-filled from the post** · post type | URL, type |
+| **Write a post** | text (280) · tag people (@handles) · post type · your X handle | text, type, your handle |
+
+Post types: **Takeaway · Quote · Story · Photo · Review**. Posts don't carry a talk. Native posts have no photo upload; photos come from tweets.
+
+**② Someone I met**
+
+| Field | Notes |
+|---|---|
+| Their name | |
+| Designation · Company | |
+| Their X handle | Recommended: it links you both on People, and gets them tagged on X |
+| Their LinkedIn | `linkedin.com/in/…` |
+| What did you talk about? | up to 1000 chars |
+| Photos | optional, **up to 4**, multi-select; each compressed on the device to 1200px, removable before posting |
+| Your X handle | required |
+
+Required: name **or** X handle **or** LinkedIn, plus the conversation and your handle.
+
+**③ Talk notes**
+
+| Field | Notes |
+|---|---|
+| Which talk? | required, from the fixed talk list (pre-selected when opened from a talk group's "+ Add notes") |
+| Your notes | required, up to 1000 chars |
+| Your X handle | optional |
+
+**Common**
+- Your X handle is pre-filled from the device and saved after your first post.
+- Required-field validation, character counters, and a basic profanity / link-spam check.
+- twitter.com links are normalised to x.com.
+
+**Success screen (wall → X)**
+- For wall posts, met and talk notes: **Post on 𝕏** opens X with text already filled in, a link back to the entry on the wall, and the hashtag.
+  - Post: *the text … with @tagged*
+  - Met: *Met Priya (@priya), Design Lead at Acme, at Config BLR. Talked about … → link*. Tags them, which is the main growth loop.
+  - Talk notes: *My notes from "Talk" at Config BLR: … → link*
+  - If the met card has photos: "X doesn't let us attach photos; add them in the X composer."
+- For all: **Make your card** (opens your Config card on the People page), **Done**.
+
+### 3.4 People — `/people/`
+Everyone engaging with the wall, with their metrics. **No leaderboard:** no ranks, no sorting by score.
+
+**Directory**
+- One row per person: initials avatar, name, @handle, designation at company, and metrics: **posts · met · upvotes · active Xm ago**. A "You" badge marks your own row.
+- **Search** by name or @handle, instant and case-insensitive (`@` optional), with a "N of M people" count.
+- **Order:** most recently active first.
+- Each row opens the person's activity; a **Config card** button on the row opens their card in a side panel.
+- **"You met N people"** panel at the top (when your handle is saved on this device): chips for each person, **Copy list** and **Download CSV** (`name, role, company, x_handle, x_url, linkedin, talked_about, logged_at`).
+
+**Person view** (`/people/?p=x:handle`, or the `?h=handle` shortcut)
+- Name, @handle, designation at company; **Config card**, X profile and LinkedIn buttons.
+- Metric tiles: Posts, People met, Upvotes.
+- "Met" chips linking to each connection.
+- **Activity:** everything they posted, plus met cards about them, newest first.
+
+**Identity and connections**
+- People are identified by X handle, otherwise LinkedIn profile, otherwise the typed name. Someone added by name now and by handle later shows up as two entries; the form nudges people to add a handle.
+- A met card from A about B counts as one connection for **both** A and B; repeat cards about the same pair count once.
+
+### 3.5 Config card — side panel (`/people/?card=x:handle`)
+- Opens from the People directory, a person's page, or "Make your card" after posting. It's in the URL, so the link can be shared and opens straight to the card.
+- **1080×1350 card:** "My Config BLR" + "Unofficial" badge; name, @handle and designation at company; metrics (**posts · people met · upvotes**); the person's **top post** (most upvoted). If nothing has upvotes yet, it shows their **latest post** instead and is labelled accordingly. Footer with the site URL.
+- **Save image:** PNG made on the device (`html-to-image`); on phones it opens the native share sheet.
+- **Share on X:** opens X with "@handle's Config BLR in one card. Add yours:" and the card link.
+- **Open the top/latest post →** goes to that post's page.
+- No separate card page and no add buttons on the card.
+
+### 3.6 Single entry — `/p/?id=…`
+- One entry, full width, with "Featured on the Config BLR Wall" copy. This is the target of every card's link button and of every "Post on X" link.
+
+### 3.7 Admin — `/admin/?key=…`
+- **Bulk seed posts:** paste X post URLs (one per line or space-separated), choose the post type for the batch. Each tweet is fetched and saved; duplicates are skipped.
+- **Quick add notes:** talk notes credited to any handle.
+- **Moderate:** search everything (including tweet text), filter to hidden only, hide or unhide.
+- Without the right key the page shows "Not found".
+
+### 3.8 Visual style
+- **Paper** design: Instrument Serif headlines, Geist body text.
+- **Background:** warm off-white `#f5f2ea`; cards `#fffdf8`.
+- **Primary colour:** near-black `#1c1b19` with white text (buttons, add cards, the "+ Add" nav button, upvoted state, the "Wall" accent in the header).
+- **Live indicator:** the blinking dot next to "Live" in the header is green `#16a34a`.
+- **Add cards:** dashed outline; on hover the outline stays and the card gets a light grey tint (no black border).
+- **Card colours:** purple for people we met, yellow for talk notes, a pastel per post type (Review is grey).
+- All colours are CSS tokens in `src/app/globals.css`; components only use tokens (except LinkedIn's brand blue).
+
+### Non-goals (v1)
+Accounts or auth, comments, DMs, auto-pulling posts from X by hashtag, notifications, editing entries after publishing, LinkedIn post embeds.
+
+---
+
+## 4. User flows
+
+### Flow A: Attendee already tweeted (X → wall)
+1. Opens the wall from a link on X.
+2. **Add to the wall** card on All → **Post** → *Paste an X link* → the preview appears with their name and photos → handle auto-filled → type "Photo" → **Post**.
+3. It appears as an X-style card under All and Posts › Photos. Success screen → **Make your card**.
+
+### Flow B: Someone I met (wall → X)
+1. People we met tab → **Add someone you met** card → "Priya Sharma", Design Lead, Acme, @priya, LinkedIn → "Talked about running remote crits. Felt less alone." → adds 3 photos → your @handle → **Post**.
+2. Purple connection card appears under All and People we met; both of you get +1 connection on `/people/`.
+3. **Post on 𝕏** → X opens with "Met Priya Sharma (@priya), Design Lead at Acme, at Config BLR …" + link → Priya gets notified → comes to the wall and logs her own. *(growth loop)*
+4. Later: People → **You met N people** → Download CSV.
+
+### Flow C: Talk notes
+1. Feed → **Talk notes** → the "Add talk notes" card (or, with **Group by talk** on, "+ Add notes" under "Design systems at scale", which pre-selects the talk) → notes → **Post**.
+2. The note appears at the top of the feed (and in that talk's group). **Post on 𝕏** → followers click → land on `/p/?id=…` → **+ Add** in the nav.
+
+### Flow D: Takeaway as a post
+1. Posts tab → **Add a post** card → *Write a post* → "The best teams write more than they draw" → type **Takeaway** → **Post** → **Post on 𝕏**.
+2. Appears under Posts › Takeaways.
+
+### Flow E: Native post
+1. Posts tab → **Add a post** card → *Write a post* → text → tags @rahul → type "Story" → your handle → **Post** → **Post on 𝕏**.
+
+### Flow F: Remote designer catches up
+1. Opens `/?tab=notes&group=talk` → reads notes talk by talk (or picks one talk from the dropdown) → switches to Posts › Takeaways, sorted Top → upvotes → shares one card.
+
+### Flow G: Admin seeds and moderates
+1. Before launch: `/admin/?key=…` → paste 15–20 X URLs from event hashtags, one batch per post type → **Create posts**.
+2. Quick-add credited talk notes (e.g. from speakers' own threads).
+3. During the event: Moderate → search → **Hide** spam (it disappears live from everyone's feed).
+
+### Flow H: Realtime
+1. Two people have the feed open. A posts → it appears instantly for A; B sees "↑ 1 new post" → taps → it slides in.
+
+---
+
+## 5. Tech requirements
+
+### Hosting: GitHub Pages (static)
+- **Next.js 16 (App Router) + TypeScript + Tailwind v4**, built with `output: "export"` into `out/`.
+- `basePath` comes from `NEXT_PUBLIC_BASE_PATH` (e.g. `/config-blr-wall` for a project site); `trailingSlash: true` so GitHub Pages serves `folder/index.html`.
+- Deployed by a GitHub Actions workflow (build, then upload `out/` to Pages).
+
+**What static hosting rules out, and how we handle it:**
+
+| Assumption | On GitHub Pages | Our approach |
+|---|---|---|
+| Dynamic routes `/people/[handle]`, `/p/[id]` | Not possible without knowing every id at build time | Query params: `/people/?p=…&card=…`, `/p/?id=…` |
+| Per-card / per-post OG images | No server to render them | One static site-wide OG image. Optional later: an Edge Function that returns OG HTML. |
+| Fetching tweet data | The browser blocks cross-origin calls to X | Supabase Edge Function `resolve-tweet` fetches it once when the post is added |
+| Server-side validation, admin key check | No server | Supabase RLS, Postgres constraints and an Edge Function / RPC for admin actions |
+| `.env` secrets | Every `NEXT_PUBLIC_*` value ships in the JS bundle | Only the Supabase **anon** key in the frontend; never the service-role key |
+
+### Data layer
+- All UI code talks to a single `Store` interface (`src/lib/store.ts`): `listPosts`, `getPost`, `createPost`, `upvote`, `myVotes`, `setHidden`, `uploadPhoto`, `resolveTweet`, `subscribe`.
+- **Now:** a mock implementation using localStorage, with BroadcastChannel to fake realtime between tabs. `resolveTweet` knows only the demo tweets; any other link falls back to the embed.
+- **Next:** a Supabase implementation behind the same interface, so the UI doesn't change.
+
+### Tweet snapshots
+- When an X link is added, `resolveTweet(url)` returns `{ id, url, text, author_name, author_handle, author_avatar, created_at, photos[], mentions[] }`, stored on the post.
+- Backend: an Edge Function calls X's public syndication endpoint (the one `react-tweet` uses). It's unofficial, so it may break or be rate-limited. If it fails, the post is saved without a snapshot and renders with the official embed. Photos should be copied to our storage so cards still work if the tweet is deleted.
+
+### Backend (Supabase): to build
+```sql
+posts (
+  id uuid pk default gen_random_uuid(),
+  type text not null check (type in ('post','met','note')),
+  author_handle text,
+  body text,                                   -- post text / met conversation / talk notes
+  -- post
+  source text check (source in ('x','native')),
+  kind text check (kind in ('takeaway','quote','story','photo','review')),
+  link_url text,
+  tweet jsonb,                                 -- saved tweet snapshot
+  tagged text[] not null default '{}',
+  -- met
+  met_name text, met_role text, met_company text, met_handle text, met_linkedin text,
+  photos text[] not null default '{}',         -- up to 4
+  -- note
+  talk text,
+  upvotes int not null default 0,
+  hidden bool not null default false,
+  is_seed bool not null default false,
+  created_at timestamptz not null default now(),
+  check (type <> 'post' or kind is not null),
+  check (type <> 'note' or talk is not null),
+  check (cardinality(photos) <= 4),
+  check (char_length(body) <= case when type = 'post' then 280 else 1000 end)
+)
+votes (post_id uuid references posts, device_id text, primary key (post_id, device_id))
+```
+- **RLS:**
+  - anon can `select` where `hidden = false`;
+  - anon can `insert` only `WITH CHECK (upvotes = 0 AND hidden = false AND is_seed = false)`;
+  - no anon `update` or `delete`.
+- **`upvote(post_id, device_id)`** as a `SECURITY DEFINER` RPC that inserts the vote and increments the count atomically (one vote per device).
+- **Storage:** public `photos` bucket for met-card photos (and copies of tweet photos), images only, ≤ 2 MB per file.
+- **Edge Functions:** `resolve-tweet`, plus admin actions (seed, quick add, hide). The service-role key stays inside Supabase.
+- **Realtime:** turn on the `posts` publication; the client listens for INSERT and UPDATE events.
+- **Rate limiting:** basic per-device / per-IP limits on insert.
+
+### Client
+- Identity: X handle stored in localStorage; a device id (UUID) in localStorage for votes.
+- Post to X via the X web intent (`x.com/intent/post`): no API key, nothing to log into.
+- X embed fallback: `widgets.js` loaded once, only when a card is near the viewport.
+- Photos compressed on the device before upload.
+- Share card: `html-to-image` (DOM → PNG), loaded only when needed.
+
+### Quality bar (acceptance)
+- [ ] Feed loads in < 2s on mobile with 40 seed posts
+- [ ] Each tab shows the right entries; Posts sub-filters work; Talk notes default to a mixed feed, "Group by talk" groups them, the dropdown filters to one talk
+- [ ] The add card opens the right form on each tab (type picker on All, pre-selected type/talk where filtered)
+- [ ] Add each of: X-link post, native post, met (with several photos), talk notes. Each appears live in another browser
+- [ ] Every field entered shows up on its card
+- [ ] Pasting an X link shows a preview and auto-fills the handle; an unknown tweet falls back to the embed
+- [ ] "Post on 𝕏" opens a pre-filled post with a link back to the wall; met posts tag the person
+- [ ] One upvote per device
+- [ ] People metrics (posts, met, upvotes) are correct; CSV includes company
+- [ ] People search finds by name and handle; Config card opens in the side panel; PNG downloads; the X share link opens the card
+- [ ] Admin can bulk-seed and hide; the admin page shows nothing without the key
+- [ ] No Figma/Config logos; "Unofficial" visible in the header
+
+---
+
+## 6. Open questions
+- Real talk list + speaker names for the day (currently placeholders in `src/lib/config.ts`).
+- The event hashtag people are actually using (`HASHTAG` in `src/lib/config.ts`, placeholder `ConfigBLR`).
+- Builder handle for the credit line (`NEXT_PUBLIC_BUILDER_HANDLE`).
+- GitHub repo name → sets `NEXT_PUBLIC_BASE_PATH` and the public URL on the card.
+- Is "Config" in the product name OK, given the no-branding rule?
+- Talk notes: should they get photo upload too (e.g. photos of slides or notebooks)? Currently no; easy to add.
+
+---
+
+## 7. Change log
+
+Newest first. The sections above always describe the current product; this log records what changed and why.
+
+### 2026-10-15 — People directory + Config card side panel; card page removed
+- **Removed the standalone card page** (`/card/`) and the "My card" nav link.
+- **People** is now a directory, not a leaderboard: no ranks; each row shows posts, people met, upvotes and last activity; most recently active first; **search by name or @handle**.
+- Each person has a **Config card** button that opens the card in a **side panel**: metrics (posts, people met, upvotes) and their **top post**, or **latest post** if nothing has upvotes yet. Save as PNG, Share on X, open the post. The panel is in the URL (`/people/?card=…`) so card links are shareable.
+- Person view gained metric tiles and an "Activity" section (their posts plus met cards about them).
+- "Make your card" after posting now opens your Config card on the People page.
+
+### 2026-10-15 — Card page: no add entry points
+- Removed the "+ Add" nav button and the "Add a takeaway to fill your card" button from the card page; it is only for viewing and sharing the card.
+
+### 2026-10-15 — Green live dot, softer add-card hover, Tailwind setup fix
+- The blinking "Live" dot is now green (`--live: #16a34a`).
+- Add cards no longer turn their border black on hover; they get a light grey tint instead.
+- Dev fix: switched Tailwind from the custom `@tailwindcss/turbopack` loader rule to the standard `@tailwindcss/postcss` plugin (`postcss.config.mjs`), as the Next docs recommend. The old setup kept serving stale CSS after edits; consecutive CSS edits now update live.
+
+### 2026-10-15 — Black primary, playground removed
+- Removed the colour playground (`/themes/`), the per-palette CSS and the theme-switching script.
+- Primary colour is now near-black `#1c1b19` (was orange `#ff5b1f`); the background stays warm off-white `#f5f2ea`.
+- Dev note: the dev server sometimes served a stale stylesheet after CSS changes; `npm run dev:clean` restarts it with a fresh cache.
+
+### 2026-10-15 — Colour playground replaces theme playground
+- Kept the original Paper design; removed the Midnight, Studio, Jacaranda and Newsprint themes and their fonts (Space Grotesk, JetBrains Mono, Fraunces, Playfair).
+- `/themes/` is now a colour playground: the original plus five palettes that change only the background and primary colour (Sage & Terracotta, Mist & Cobalt, Blush & Plum, Butter & Forest, Stone & Teal). All five have better text contrast than the original orange.
+- Nav link renamed "Colours".
+
+### 2026-10-15 — Theme playground
+- Added `/themes/`: five themes (Paper, Midnight, Studio, Jacaranda, Newsprint) previewed side by side with real cards, with **Apply** to switch the whole site (saved per browser).
+- All hard-coded colours in components replaced with theme tokens (surface, danger, link, met/note backgrounds and lines, tag colours); display font and corner radii are per-theme tokens too.
+- Added the "Themes" link to the top nav (desktop).
+
+### 2026-10-15 — Rounded counters
+- Tab counts and the header’s posts/people counter show exact numbers up to 100, then 100+, 150+, 200+, 250+… (steps of 50). Upvote counts stay exact.
+
+### 2026-10-15 — Add cards, sort on the tab row, Talk notes view toggle
+- **Talk notes** now default to a mixed feed; **Group by talk** is an optional toggle (`&group=talk`) next to the talk dropdown.
+- **Latest / Top** moved onto the tab row (right-aligned). The second toolbar row only appears for Posts and Talk notes.
+- **Removed the floating "+ Add to the wall" button.** Every tab now starts with a small **Add card**: on All it opens the type picker; on other tabs it opens that tab's form directly, pre-selecting the post type (Posts sub-filter) or talk (Talk notes filter).
+- Pages outside the feed (People directory, My card, single entry) get a **"+ Add"** button in the top nav.
+- **Review** type tag is now grey.
+
+### 2026-10-15 — Feed refinements: Talk notes, one post card, purple met card
+- **Takeaways tab → Talk notes.** Talk notes are just a talk (required) + notes (1000 chars); no headline, no "outside the talks". The tab groups notes under each talk, with a talk dropdown (default **All talks**).
+- **Takeaway is now only a post type** (with Quote, Story, Photo, Review). The separate takeaway card is gone; posts no longer carry a talk.
+- **Talk filter dropdown removed** from All; it only exists inside Talk notes.
+- **One post card design** for X and wall posts: type tag, X logo (X posts) or "Wall post" label (native), "View on X", engagement row (𝕏 for wall posts, copy link, upvote).
+- **People we met** now uses the editorial card in purple: "@you met Priya" → who they are → what we discussed → photos.
+- **Multiple photos on met cards** (up to 4, multi-select, removable). The demo feed includes a met card with 3 photos.
+- Data model: `type` is now `post | met | note`; `photo_url` → `photos[]`; removed `context` and `notes` (a note's text is `body`).
+- Admin quick add now creates talk notes. My card logic is unchanged for now (to be revisited).
+
+### 2026-10-15 — Feed rebuilt as three sections (Posts · People we met · Takeaways)
+- **Feed tabs:** All · Posts · People we met · Takeaways, with counts. Posts has sub-filters (Takeaways, Quotes, Stories, Photos, Reviews). Posts typed "Takeaway" also show in the Takeaways tab. The talk filter applies to All and Takeaways.
+- **Posts are X-first:** pasting an X link fetches the tweet (text, photos, author, mentions), shows a preview and auto-fills the handle. Posts render as **our own X-style card** from that saved copy, falling back to X's embed. Native posts are written on the wall, can tag people, and can be posted to X.
+- **Reviews** are now a post type, not their own section. Ratings were dropped.
+- **People we met** gained designation, company and an optional photo together. The conversation can be up to 1000 chars. "Post on 𝕏" tags the person.
+- **Takeaways** gained "Outside the talks" with free-text context, plus a separate notes field (1000 chars). The takeaway itself stays at 280 so it fits on X.
+- **Photos:** shown when the tweet has them, and one optional photo on met cards. No uploads on native posts or takeaways. Storage is back in the backend plan.
+- **Card designs:** three distinct cards (white X-style post, purple connection card, yellow editorial takeaway), each showing every field from creation. Every native card has a 𝕏 button.
+- **LinkedIn post links are no longer accepted** for posts (Posts are X-only). LinkedIn stays as a profile link on met cards.
+- Data model: `type` is now `post | met | takeaway`; added `source`, `kind`, `tweet` (snapshot), `tagged`, `met_company`, `photo_url`, `context`, `notes`; removed `tag`, `disliked`, `rating`.
+- Store: added `resolveTweet` and `uploadPhoto`. Admin bulk seed fetches each tweet and is X-only. CSV export adds company.
+
+### 2026-10-15 — Four-section posting + wall → X
+- **Add to the wall** now has four sections instead of six post types: **Share your X post**, **Takeaway**, **Who I met**, **Review**.
+  - Shared X/LinkedIn posts are tagged Takeaway / Quote / Story / Photo so they show under the wall's filters.
+  - Takeaways can be written on the wall or shared from X, and can be about a specific talk or *the event overall*.
+  - Who I met accepts an X handle, a LinkedIn profile, or just a name + role, plus what you talked about / how it felt.
+  - New **Review** section: optional ★ rating, what you liked, what could be better.
+- **Wall → X:** after posting a takeaway, met or review, the success screen offers **Also post on X** (pre-filled text + link back to the wall + hashtag; tags the person you met).
+- **Removed** native photo, quote and story posts. Photos, quotes and stories now come in as tagged X posts, so the backend no longer needs Storage.
+- Wall chips: All, Takeaways, People met, Reviews, From X, Quotes, Stories, Photos.
+- People: people are identified by X handle, then LinkedIn profile, then name; the CSV export now includes name, role and LinkedIn.
+- Card: the top takeaway is drawn from written takeaways, falling back to your review.
+- Admin: bulk seed takes a tag per batch; quick add is takeaways only.
+- Data model: `type` is now `x_post | takeaway | met | review`; added `tag`, `disliked`, `rating`, `met_name`, `met_role`, `met_linkedin`; removed `quote_by` and `photo_url`.
+
+### 2026-10-15 — First draft
+- PRD written; frontend wireframe built as a Next.js static export for GitHub Pages, running on mock data (localStorage + cross-tab realtime).
+- Moved away from the original PRD because GitHub Pages is static: `/card/?h=` and `/p/?id=` instead of dynamic routes, one site-wide OG image, and admin security has to live in the backend.

@@ -1,0 +1,132 @@
+@import "tailwindcss";
+
+/* Design tokens: off-white paper, near-black primary. */
+:root {
+  --paper: #f5f2ea;
+  --card: #fffdf8;
+  --surface: #ffffff;
+  --ink: #161513;
+  --muted: #6b665c;
+  --line: #e2ddd1;
+  --accent: #1c1b19;
+  --accent-ink: #ffffff;
+  --danger: #b23a0c;
+  --link: #1d9bf0;
+  --live: #16a34a;
+
+  --met-bg: #f7f2ff;
+  --met-line: #d7c6ff;
+  --met-strong: #5b3fd1;
+  --note-bg: #fffbea;
+  --note-line: #ecd57a;
+
+  --t-takeaway: #ffe7a3;
+  --t-quote: #d9e8ff;
+  --t-photo: #ffd9e4;
+  --t-story: #dff2d8;
+  --t-met: #ece0ff;
+  --t-review: #e4e4e4;
+
+  --font-display: var(--font-instrument);
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-card: var(--card);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-danger: var(--danger);
+  --color-link: var(--link);
+  --color-live: var(--live);
+  --color-met-bg: var(--met-bg);
+  --color-met-line: var(--met-line);
+  --color-met-strong: var(--met-strong);
+  --color-note-bg: var(--note-bg);
+  --color-note-line: var(--note-line);
+  --color-t-takeaway: var(--t-takeaway);
+  --color-t-quote: var(--t-quote);
+  --color-t-photo: var(--t-photo);
+  --color-t-story: var(--t-story);
+  --color-t-met: var(--t-met);
+  --color-t-review: var(--t-review);
+  --font-sans: var(--font-geist-sans);
+  --font-serif: var(--font-display);
+  --font-mono: var(--font-geist-mono);
+}
+
+html {
+  background: var(--paper);
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.animate-slide-in {
+  animation: slide-in 380ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes sheet-up {
+  from {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+.animate-sheet-up {
+  animation: sheet-up 260ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+.animate-fade-in {
+  animation: fade-in 200ms ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-slide-in,
+  .animate-sheet-up,
+  .animate-fade-in {
+    animation: none;
+  }
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

@@ -167,11 +167,15 @@ Everyone engaging with the wall, with their metrics. **No leaderboard:** no rank
 ### 3.6 Single entry — `/p/?id=…`
 - One entry, full width, with "Featured on the Config BLR Wall" copy. This is the target of every card's link button and of every "Post on X" link.
 
-### 3.7 Admin — `/admin/?key=…`
-- **Bulk seed posts:** paste X post URLs (one per line or space-separated), choose the post type for the batch. Each tweet is fetched and saved; duplicates are skipped.
-- **Quick add notes:** talk notes credited to any handle.
-- **Moderate:** search everything (including tweet text), filter to hidden only, hide or unhide.
-- Without the right key the page shows "Not found".
+### 3.7 Admin — `/admin/`
+- **Locked by an admin secret.** `/admin/` shows only an **"Admin secret"** box and **Unlock**. Paste the secret once per device; it's remembered until you tap **Lock**. A remembered secret is re-checked on every visit, and a wrong or changed secret locks the page again.
+- **The server checks the secret on every admin action** (step 2): it's stored in Supabase, never in the website's code, the repo, or chat. Live builds stay locked for everyone until that server check exists. Locally the secret is `local-admin` (mock data only).
+- If the secret leaks: generate a new one; the old one stops working immediately.
+- **What admin can do** (others can't):
+  - **Bulk seed posts:** paste X post URLs (one per line or space-separated), choose the post type for the batch. Each tweet is fetched and saved; duplicates are skipped.
+  - **Quick add notes:** talk notes credited to any handle.
+  - **Moderate:** see **all** posts including hidden and deleted ones, search (including tweet text), filter to hidden only, **Hide / Unhide** any post (restores deleted posts too).
+  - Overview counts (total, hidden, seeds); **Reset mock data** (local only).
 
 ### 3.8 Visual style
 - **Paper** design: Instrument Serif headlines, Geist body text.
@@ -215,7 +219,7 @@ Accounts or auth, comments, DMs, auto-pulling posts from X by hashtag, notificat
 1. Opens `/?tab=notes&group=talk` → reads notes talk by talk (or picks one talk from the dropdown) → switches to Posts › Takeaways, sorted Top → upvotes → shares one card.
 
 ### Flow G: Admin seeds and moderates
-1. Before launch: `/admin/?key=…` → paste 15–20 X URLs from event hashtags, one batch per post type → **Create posts**.
+1. Before launch: `/admin/` → enter the admin secret → paste 15–20 X URLs from event hashtags, one batch per post type → **Create posts**.
 2. Quick-add credited talk notes (e.g. from speakers' own threads).
 3. During the event: Moderate → search → **Hide** spam (it disappears live from everyone's feed).
 
@@ -361,6 +365,9 @@ votes (post_id uuid references posts, device_id text, primary key (post_id, devi
 ## 7. Change log
 
 Newest first. The sections above always describe the current product; this log records what changed and why.
+
+### 2026-10-15 — Admin unlocked with a secret
+- `/admin/` no longer uses a `?key=` link. It shows an **"Admin secret"** box: paste once per device, **Unlock**, and it's remembered until **Lock**. Live builds verify the secret on the server (step 2) and stay locked until then; locally the secret is `local-admin`.
 
 ### 2026-10-15 — Only the poster can delete
 - Delete is back to **owner-only**: the ⋮ → Delete menu shows only on posts made from this device, and the store refuses deletes from other devices. When live, the server checks the device id against the post's private `device_id`. Still a soft delete; admin can remove or restore any post.

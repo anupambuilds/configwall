@@ -108,6 +108,26 @@ export function useMyPostIds(): Set<string> {
   return useSyncExternalStore(subscribeMine, readMyPostIds, () => NO_POSTS);
 }
 
+// ---------------------------------------------------------------------------
+// Admin secret, entered once per device on /admin and sent with every admin
+// action (the server checks it each time). "Lock" forgets it.
+// ---------------------------------------------------------------------------
+const ADMIN_SECRET_KEY = "cbw:admin-secret";
+
+export function getAdminSecret(): string | null {
+  return safeGet(ADMIN_SECRET_KEY);
+}
+
+export function setAdminSecret(secret: string) {
+  safeSet(ADMIN_SECRET_KEY, secret);
+}
+
+export function clearAdminSecret() {
+  try {
+    localStorage.removeItem(ADMIN_SECRET_KEY);
+  } catch {}
+}
+
 const noopSubscribe = () => () => {};
 
 /** False during prerender/hydration, true once running in the browser. */

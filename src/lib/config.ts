@@ -35,8 +35,8 @@ export const APP_ENV: AppEnv = (["test", "production"] as const).find((e) => e =
 export const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 export const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || "";
 
-// Local-only admin gate. On a static site this is NOT real security — the
-// backend (Supabase RLS / edge function) must enforce admin rights.
+// Admin secret for LOCAL DEVELOPMENT ONLY (mock store). Live builds verify
+// the secret on the server and never ship it in the page.
 export const ADMIN_KEY = process.env.NEXT_PUBLIC_ADMIN_KEY || "local-admin";
 
 /** Posts and takeaways: fits on X. */

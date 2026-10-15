@@ -1,5 +1,6 @@
 "use client";
 
+import { ADMIN_KEY, APP_ENV } from "./config";
 import { getDeviceId, readMyPostIds } from "./identity";
 import { buildMockSeed, MOCK_TWEETS } from "./mock-seed";
 import type { NewPost, Post, TweetSnapshot } from "./types";
@@ -32,6 +33,11 @@ export interface Store {
    * matches the post's private device_id.
    */
   deletePost(postId: string): Promise<void>;
+  /**
+   * Checks an admin secret. Live: an Edge Function compares it with the
+   * secret stored in Supabase. Mock: only works in local development.
+   */
+  verifyAdmin(secret: string): Promise<boolean>;
   /** Records this device's visit; returns the unique visitor count. */
   recordVisit(): Promise<number>;
   /** Public URL for an uploaded (already compressed) photo. */
@@ -196,6 +202,12 @@ function createMockStore(): Store {
       post.hidden = true;
       save(posts);
       emit({ kind: "update", post, fromThisTab: true });
+    },
+
+    async verifyAdmin(secret) {
+      await delay(300);
+      // Fail closed outside local dev: the real check lives on the server.
+      return APP_ENV === "local" && secret === ADMIN_KEY;
     },
 
     async recordVisit() {

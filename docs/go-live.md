@@ -54,7 +54,7 @@ Verified facts behind this audit (2026-10-15):
 ### Admin `/admin/`
 | Action | Status |
 |---|---|
-| Access check | ❌ Key is checked in the browser and ships in the JS. Needs a server-side secret (Edge Function). |
+| Access check | ⚠️ "Admin secret → Unlock" screen built; remembered per device with a Lock button. Live builds fail closed until the `verify-admin` Edge Function checks the secret (stored as a Supabase secret, never in the page). |
 | Bulk seed X links | ❌ Needs the server function (tweet fetch + insert with service role). |
 | Quick-add talk notes | ❌ Needs the server function (anon cannot insert). |
 | Hide / unhide | ❌ Needs the server function + moderation broadcast. |

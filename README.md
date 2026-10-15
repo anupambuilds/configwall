@@ -13,7 +13,7 @@ npm run dev:clean  # dev server with a fresh cache
 
 The app currently runs on **mock data** stored in your browser (localStorage). Open two tabs to see realtime updates.
 
-- Admin: `http://localhost:3000/admin/?key=local-admin`. Use "Reset mock data" there to start over.
+- Admin: `http://localhost:3000/admin/`, then enter the admin secret `local-admin` (local only) and **Unlock**. Use "Reset mock data" there to start over, and **Lock** to forget the secret on this device.
 - Talk list and builder handle: `src/lib/config.ts`. Mock seed posts: `src/lib/mock-seed.ts`.
 - All data access goes through `src/lib/store.ts`. The Supabase backend plugs in there.
 - Database schema: `supabase/migrations/0001_init.sql`. Run `npm run check:schema` to confirm every field the UI collects has a column.

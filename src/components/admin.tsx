@@ -1,28 +1,93 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
-import { useMemo, useState } from "react";
-import { ADMIN_KEY, TALKS } from "@/lib/config";
-import { getStore, resetMockData } from "@/lib/store";
+import { useEffect, useMemo, useState } from "react";
+import { TALKS } from "@/lib/config";
+import { clearAdminSecret, getAdminSecret, setAdminSecret } from "@/lib/identity";
+import { DATA_SOURCE, getStore, resetMockData } from "@/lib/store";
 import { displayKind, EMPTY_POST, KIND_LABELS, POST_KINDS, type NewPost, type Post, type PostKind } from "@/lib/types";
 import { usePosts } from "@/lib/use-posts";
 import { cx, handleFromXUrl, linkKind, normalizeHandle, normalizeLink, timeAgo, validatePost } from "@/lib/util";
 
+type Gate = "checking" | "locked" | "unlocked";
+
+/**
+ * Admin is behind a secret: paste it once per device, it's remembered, and
+ * every admin action is checked again by the server. Nobody else gets past
+ * the "Admin secret" box.
+ */
 export function Admin() {
-  const key = useSearchParams().get("key");
-  // Placeholder gate only: on a static site this key ships in the JS bundle.
-  // Real protection must live in the backend (RLS / edge function).
-  if (key !== ADMIN_KEY) {
-    return (
-      <main className="mx-auto grid w-full max-w-md flex-1 place-items-center px-4">
-        <p className="text-muted">Not found.</p>
-      </main>
-    );
-  }
-  return <AdminPanel />;
+  const [gate, setGate] = useState<Gate>("checking");
+
+  // A secret remembered on this device is re-checked on every visit.
+  useEffect(() => {
+    let alive = true;
+    const saved = getAdminSecret();
+    (saved ? getStore().verifyAdmin(saved) : Promise.resolve(false)).then((ok) => {
+      if (!alive) return;
+      if (!ok && saved) clearAdminSecret();
+      setGate(ok ? "unlocked" : "locked");
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  if (gate === "checking") return <main className="flex-1" aria-busy />;
+  if (gate === "locked") return <AdminLogin onUnlocked={() => setGate("unlocked")} />;
+  return (
+    <AdminPanel
+      onLock={() => {
+        clearAdminSecret();
+        setGate("locked");
+      }}
+    />
+  );
 }
 
-function AdminPanel() {
+function AdminLogin({ onUnlocked }: { onUnlocked: () => void }) {
+  const [secret, setSecret] = useState("");
+  const [state, setState] = useState<"idle" | "checking" | "wrong">("idle");
+
+  async function unlock(e: React.FormEvent) {
+    e.preventDefault();
+    const s = secret.trim();
+    if (!s || state === "checking") return;
+    setState("checking");
+    const ok = await getStore().verifyAdmin(s).catch(() => false);
+    if (!ok) return setState("wrong");
+    setAdminSecret(s);
+    onUnlocked();
+  }
+
+  return (
+    <main className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center px-4 py-16">
+      <h1 className="font-serif text-4xl tracking-[-0.02em]">Admin</h1>
+      <p className="mt-1 text-sm text-muted">Paste your admin secret. This device will remember it until you lock.</p>
+      <form onSubmit={unlock} className="mt-6 flex flex-col gap-3">
+        <label className="flex flex-col gap-1.5">
+          <span className="text-xs font-medium text-muted">Admin secret</span>
+          <input
+            type="password"
+            value={secret}
+            onChange={(e) => {
+              setSecret(e.target.value);
+              if (state === "wrong") setState("idle");
+            }}
+            autoComplete="current-password"
+            autoFocus
+            className={box}
+          />
+        </label>
+        {state === "wrong" && <p className="text-sm text-danger">Wrong secret.</p>}
+        <button disabled={!secret.trim() || state === "checking"} className="rounded-full bg-ink py-3 font-semibold text-paper disabled:opacity-50">
+          {state === "checking" ? "Checking…" : "Unlock"}
+        </button>
+      </form>
+    </main>
+  );
+}
+
+function AdminPanel({ onLock }: { onLock: () => void }) {
   const { posts } = usePosts({ includeHidden: true });
   const [tab, setTab] = useState<"seed" | "quick" | "moderate">("seed");
 
@@ -35,17 +100,24 @@ function AdminPanel() {
             {posts.length} posts · {posts.filter((p) => p.hidden).length} hidden · {posts.filter((p) => p.is_seed).length} seeds
           </p>
         </div>
-        <button
-          onClick={() => {
-            if (window.confirm("Reset all local mock data to the demo seed?")) {
-              resetMockData();
-              location.reload();
-            }
-          }}
-          className="rounded-full border border-line px-3 py-1.5 text-xs text-muted hover:border-ink/30 hover:text-ink"
-        >
-          Reset mock data
-        </button>
+        <div className="flex gap-2">
+          {DATA_SOURCE === "mock" && (
+            <button
+              onClick={() => {
+                if (window.confirm("Reset all local mock data to the demo seed?")) {
+                  resetMockData();
+                  location.reload();
+                }
+              }}
+              className="rounded-full border border-line px-3 py-1.5 text-xs text-muted hover:border-ink/30 hover:text-ink"
+            >
+              Reset mock data
+            </button>
+          )}
+          <button onClick={onLock} className="rounded-full bg-ink px-3 py-1.5 text-xs font-semibold text-paper">
+            Lock
+          </button>
+        </div>
       </div>
 
       <div className="mt-6 flex gap-1 rounded-full border border-line bg-card p-1 text-sm">

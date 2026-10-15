@@ -245,11 +245,11 @@ Accounts or auth, comments, DMs, auto-pulling posts from X by hashtag, notificat
 ### Environments
 | | Site | Supabase project | Deployed from |
 |---|---|---|---|
-| **Local** | `http://localhost:3000` | test (`gwgrxwgpovpswwqppexf`) via `.env.local` | your machine |
-| **Test** | `https://anupambuilds.github.io/configwall/test/` | test (`gwgrxwgpovpswwqppexf`) | every push to `main` |
-| **Production** | `https://anupambuilds.github.io/configwall/` | production (`olmdpakuiawvtiolbhne`, "Config Wall") | the `production` branch |
+| **Local** | `http://localhost:3000` | test (`qhgbroeuqxdnybkryrfm`) via `.env.local` | your machine |
+| **Test** | `https://anupambuilds.github.io/configwall/test/` | test (`qhgbroeuqxdnybkryrfm`) | every push to `main` |
+| **Production** | `https://anupambuilds.github.io/configwall/` | production (`grcvftfxgtqoiqzeevsv`, `configwall-prod`) | the `production` branch |
 
-- Both Supabase projects are in `ap-northeast-2` (Seoul) and have the same schema (`0001_init.sql` applied and verified on both).
+- Both Supabase projects are in `ap-south-1` (Mumbai) and have the same schema (`0001_init.sql` applied and verified on both).
 - Non-production builds show a yellow banner ("Test environment… / Local development") with the data source.
 - **Until a `production` branch exists, the public URL shows a "coming soon" page.** Launch or release = update the `production` branch (merge `main` into it).
 - One GitHub Actions workflow (`.github/workflows/deploy.yml`) builds both sites into one GitHub Pages deployment; it runs `check:schema` on every build.

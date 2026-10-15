@@ -24,10 +24,10 @@ concurrency:
 
 env:
   SITE_ORIGIN: https://anupambuilds.github.io
-  TEST_SUPABASE_URL: https://gwgrxwgpovpswwqppexf.supabase.co
-  TEST_SUPABASE_KEY: sb_publishable_RExfQUuzHjifxZrnf5e5SA_vzX98sKL
-  PROD_SUPABASE_URL: https://olmdpakuiawvtiolbhne.supabase.co
-  PROD_SUPABASE_KEY: sb_publishable_Jryk56R_Yn1Fkiq8Kf_PBA_h1hGgj_A
+  TEST_SUPABASE_URL: https://qhgbroeuqxdnybkryrfm.supabase.co
+  TEST_SUPABASE_KEY: sb_publishable_YouM-R3ADxP8X6S-2raTTQ_yJ3voRxy
+  PROD_SUPABASE_URL: https://grcvftfxgtqoiqzeevsv.supabase.co
+  PROD_SUPABASE_KEY: sb_publishable_Ye6wgikAVI3J9xQTIG_Tbw_tzoNtp6t
 
 jobs:
   build:

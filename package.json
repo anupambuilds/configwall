@@ -11,6 +11,7 @@
     "check:schema": "node scripts/check-schema.mjs"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.118.0",
     "html-to-image": "^1.11.13",
     "next": "16.4.1",
     "react": "19.3.0",

@@ -46,9 +46,9 @@ Windows notes: in PowerShell use `npx.cmd` (script execution is disabled). In Gi
 
 | | URL | Supabase project | Deploys from |
 |---|---|---|---|
-| Local | http://localhost:3000 | test `gwgrxwgpovpswwqppexf` | `.env.local` |
-| Test | https://anupambuilds.github.io/configwall/test/ | test `gwgrxwgpovpswwqppexf` | push to `main` |
-| Production | https://anupambuilds.github.io/configwall/ | production `olmdpakuiawvtiolbhne` | `production` branch |
+| Local | http://localhost:3000 | test `qhgbroeuqxdnybkryrfm` | `.env.local` |
+| Test | https://anupambuilds.github.io/configwall/test/ | test `qhgbroeuqxdnybkryrfm` | push to `main` |
+| Production | https://anupambuilds.github.io/configwall/ | production `grcvftfxgtqoiqzeevsv` | `production` branch |
 
 - Until a `production` branch exists, the public URL serves a "coming soon" page. Release = merge `main` into `production`.
 - Non-production builds show a yellow banner with the environment and the data source.

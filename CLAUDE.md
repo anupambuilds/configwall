@@ -111,7 +111,8 @@ One table, `posts`, with `type` ∈ `post | met | note`. People, connections and
 Changing the model? Update `types.ts`, `EMPTY_POST`, `db.ts`, a **new** migration in `supabase/migrations/` (applied to test, then production), `validatePost`, the mock seed, and `product.md`. `npm run check:schema` must pass.
 
 ## UI conventions
-- Admin: `/admin/` shows an "Admin secret" box; the secret is stored per device (`cbw:admin-secret`), re-verified on each visit and sent with every admin action. Only the server may verify it; never ship the live secret in the page (local mock secret: `local-admin`).
+- Admin mode = the normal wall + an admin bar (Show hidden, Read-only, Lock): delete any post, Unhide hidden posts in place, bulk X links in the Post form, notes credited to any handle. State lives in the shell context (`useShell().isAdmin`, `showHidden`, `readOnly`). Read-only is a `settings` row; non-admins can't post or delete while it's on.
+- Admin unlock: `/admin/` shows an "Admin secret" box; the secret is stored per device (`cbw:admin-secret`), re-verified on each visit and sent with every admin action. Only the server may verify it; never ship the live secret in the page (local mock secret: `local-admin`).
 - Grid: 1 column < 640px, 2 columns < 1024px, max 3 columns (embedded X posts need ≥250px).
 - Feed tabs: All · Posts (sub-filters by kind) · People we met · Talk notes (mixed by default, optional "Group by talk"). Latest/Top on the tab row. The first card on each tab is a dashed **Add card**.
 - Counters show exact numbers up to 100, then `100+`, `150+`, … (`formatCount`).

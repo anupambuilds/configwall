@@ -38,6 +38,10 @@ export interface Store {
    * secret stored in Supabase. Mock: only works in local development.
    */
   verifyAdmin(secret: string): Promise<boolean>;
+  /** Site-wide settings (read-only mode). */
+  getSettings(): Promise<Settings>;
+  /** Admin: pause/resume posting and deleting for everyone. */
+  setReadOnly(on: boolean): Promise<void>;
   /** Records this device's visit; returns the unique visitor count. */
   recordVisit(): Promise<number>;
   /** Public URL for an uploaded (already compressed) photo. */
@@ -59,10 +63,16 @@ export class DuplicatePostError extends Error {
   }
 }
 
+export interface Settings {
+  /** Posting and deleting paused for everyone except admin. */
+  readOnly: boolean;
+}
+
 export type StoreEvent =
   | { kind: "insert"; post: Post; fromThisTab: boolean }
   | { kind: "update"; post: Post; fromThisTab: boolean }
-  | { kind: "delete"; id: string; fromThisTab: boolean };
+  | { kind: "delete"; id: string; fromThisTab: boolean }
+  | { kind: "settings"; settings: Settings; fromThisTab: boolean };
 
 // ---------------------------------------------------------------------------
 // Local mock: localStorage for persistence, BroadcastChannel to fake realtime
@@ -72,6 +82,7 @@ export type StoreEvent =
 const POSTS_KEY = "cbw:mock:posts:v4";
 const VOTES_KEY = "cbw:mock:votes:v4";
 const VISITS_KEY = "cbw:mock:visits:v1";
+const SETTINGS_KEY = "cbw:mock:settings:v1";
 
 function read<T>(key: string, fallback: T): T {
   try {
@@ -210,6 +221,17 @@ function createMockStore(): Store {
       return APP_ENV === "local" && secret === ADMIN_KEY;
     },
 
+    async getSettings() {
+      return read<Settings>(SETTINGS_KEY, { readOnly: false });
+    },
+
+    async setReadOnly(on) {
+      await delay(120);
+      const settings = { readOnly: on };
+      write(SETTINGS_KEY, settings);
+      emit({ kind: "settings", settings, fromThisTab: true });
+    },
+
     async recordVisit() {
       const seen = new Set(read<string[]>(VISITS_KEY, []));
       seen.add(getDeviceId());
@@ -255,6 +277,7 @@ export function resetMockData() {
     localStorage.removeItem(POSTS_KEY);
     localStorage.removeItem(VOTES_KEY);
     localStorage.removeItem(VISITS_KEY);
+    localStorage.removeItem(SETTINGS_KEY);
   } catch {}
 }
 

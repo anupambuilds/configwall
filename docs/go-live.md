@@ -87,6 +87,7 @@ Every field the forms collect has a column; `npm run check:schema` enforces it. 
 2. `create-post` server function: validation, tweet fetch + snapshot mapping (expand t.co, decode entities, long posts), dedupe, device id, rate limit, idempotency, field-level errors.
 3. Photo upload function (signed upload to the `photos` bucket).
 4. Admin server function with a secret (seed, quick add, hide/unhide + live removal broadcast).
+4a. Admin Edge Functions, all checking the admin secret: `verify-admin`, `admin-hide` (hide/unhide any post), bulk add via `create-post` with an admin flag (seed, no rate limit, credit to any handle), `set-read-only` (updates `settings`), plus the moderation broadcast. `create-post` and `delete-post` must refuse non-admins while `settings.read_only` is true.
 4b. `delete-post` server function: only when the caller's device id matches the post's private `device_id` (otherwise 403); sets `hidden` (soft delete, restorable by admin), records when, rate-limits, and broadcasts the removal. When a deleted tweet is re-shared and restored, its `device_id` becomes the new sharer's.
 5. Placeholders: real talk list, event hashtag, your X handle, admin secret.
 6. Mock seed data must never load outside local development.
@@ -108,7 +109,7 @@ Every field the forms collect has a column; `npm run check:schema` enforces it. 
 | 3 | Error handling: field errors, drafts, retries, rate-limit messages | test |
 | 4 | Launch polish: placeholders, noindex test site, favicon/OG, region decision | test |
 | 5 | Full test pass on the test site (checklist below), phone + two browsers | test |
-| 6 | Production: apply migrations + functions + secrets to production, seed real content, create `production` branch → deploy, smoke test | production |
+| 6 | Production: apply migrations (0001–0003; 0002 and 0003 are on test only so far) + functions + secrets to production, seed real content, create `production` branch → deploy, smoke test | production |
 | 7 | During the event: moderate via admin, watch function logs | production |
 
 ## 6. Test checklist (step 5)
@@ -123,4 +124,5 @@ Every field the forms collect has a column; `npm run check:schema` enforces it. 
 - [ ] Admin: seed, quick add, hide → disappears live elsewhere; admin unreachable without the secret
 - [ ] People: search, metrics, Config card PNG on iPhone and Android, share to X opens with the right link
 - [ ] Airplane mode mid-post → draft kept, retry works
+- [ ] Admin: unlock, Show hidden → Unhide, Delete (admin) on someone else's post, paste 5 links at once, notes credited to another handle, Read-only on → second phone sees "Posting is paused" and can't post or delete → off again; Lock
 - [ ] No test banner and no demo data in production

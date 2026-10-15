@@ -7,7 +7,8 @@ import { getMyHandle, rememberMyPost, setMyHandle } from "@/lib/identity";
 import { compressImage } from "@/lib/image";
 import { DuplicatePostError, getStore } from "@/lib/store";
 import { EMPTY_POST, KIND_LABELS, MAX_MET_PHOTOS, POST_KINDS, type NewPost, type Post, type PostKind, type PostType, type TweetSnapshot } from "@/lib/types";
-import { cx, handleFromXUrl, linkKind, normalizeHandle, normalizeLink, parseHandles, timeAgo, validatePost } from "@/lib/util";
+import { cx, handleFromXUrl, linkKind, normalizeHandle, normalizeLink, parseHandles, timeAgo, tweetIdFromUrl, validatePost } from "@/lib/util";
+import { useShell } from "./app-shell";
 import { XLogo } from "./icons";
 
 const SECTIONS: { type: PostType; label: string; hint: string; icon: React.ReactNode }[] = [
@@ -27,7 +28,7 @@ export function AddPostSheet({
   initialTalk?: string;
   initialKind?: PostKind;
   onClose: () => void;
-  onPosted: (post: Post) => void;
+  onPosted: (post: Post, message?: string) => void;
 }) {
   const [type, setType] = useState<PostType | null>(initialType ?? null);
   const close = useEffectEvent(onClose);
@@ -102,8 +103,9 @@ function useFormError(formKey: string) {
 async function submitDraft(
   draft: NewPost,
   setError: (m: string) => void,
-  onPosted: (p: Post) => void,
-  onDuplicate?: (existing: Post) => void
+  onPosted: (p: Post, message?: string) => void,
+  onDuplicate?: (existing: Post) => void,
+  opts?: { asAdmin?: boolean }
 ): Promise<boolean> {
   const problem = validatePost(draft);
   if (problem) {
@@ -111,9 +113,11 @@ async function submitDraft(
     return false;
   }
   try {
-    const post = await getStore().createPost(draft);
-    rememberMyPost(post.id);
-    if (draft.author_handle && (draft.type !== "post" || draft.source === "native")) setMyHandle(draft.author_handle);
+    const post = await getStore().createPost(draft, { isSeed: !!opts?.asAdmin });
+    if (!opts?.asAdmin) {
+      rememberMyPost(post.id);
+      if (draft.author_handle && (draft.type !== "post" || draft.source === "native")) setMyHandle(draft.author_handle);
+    }
     onPosted(post);
     return true;
   } catch (err) {
@@ -153,7 +157,23 @@ function useMyHandleField() {
 // Post (X-first)
 // ---------------------------------------------------------------------------
 
-function PostForm({ initialKind, onPosted }: { initialKind?: PostKind; onPosted: (p: Post) => void }) {
+/** Distinct X status links in free text (one per line or space-separated). */
+function parseTweetLinks(text: string): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const raw of text.split(/\s+/)) {
+    const url = normalizeLink(raw);
+    const id = tweetIdFromUrl(url);
+    if (id && !seen.has(id)) {
+      seen.add(id);
+      out.push(url);
+    }
+  }
+  return out;
+}
+
+function PostForm({ initialKind, onPosted }: { initialKind?: PostKind; onPosted: (p: Post, message?: string) => void }) {
+  const { isAdmin } = useShell();
   const [mode, setMode] = useState<"x" | "native">("x");
   const [link, setLink] = useState("");
   const [tweet, setTweet] = useState<TweetSnapshot | null>(null);
@@ -170,6 +190,42 @@ function PostForm({ initialKind, onPosted }: { initialKind?: PostKind; onPosted:
   useEffect(() => () => clearTimeout(timer.current), []);
 
   const linkHandle = linkKind(link) === "x" ? handleFromXUrl(link) : null;
+  // Admin bulk mode: more than one X link pasted.
+  const bulkLinks = isAdmin && mode === "x" ? parseTweetLinks(link) : [];
+  const isBulk = bulkLinks.length > 1;
+
+  async function submitBulk() {
+    if (!kind) return setError("Pick what kind of posts these are.");
+    setBusy(true);
+    const store = getStore();
+    let added: Post | null = null;
+    let addedCount = 0;
+    let dupes = 0;
+    let failed = 0;
+    for (const url of bulkLinks) {
+      try {
+        if (await store.findByTweet(url)) {
+          dupes++;
+          continue;
+        }
+        const snap = await store.resolveTweet(url).catch(() => null);
+        added = await store.createPost(
+          { ...EMPTY_POST, type: "post", source: "x", kind, link_url: url, tweet: snap, author_handle: snap?.author_handle ?? handleFromXUrl(url) },
+          { isSeed: true }
+        );
+        addedCount++;
+      } catch (err) {
+        if (err instanceof DuplicatePostError) dupes++;
+        else failed++;
+      }
+    }
+    if (!added) {
+      setBusy(false);
+      return setError(dupes ? "All of these are already on the wall." : "Couldn't add these links. Try again.");
+    }
+    const extra = [dupes && `${dupes} already on the wall`, failed && `${failed} failed`].filter(Boolean).join(", ");
+    onPosted(added, `Added ${addedCount} post${addedCount === 1 ? "" : "s"}${extra ? ` (skipped: ${extra})` : ""}`);
+  }
 
   function onLinkChange(value: string) {
     setLink(value);
@@ -194,6 +250,7 @@ function PostForm({ initialKind, onPosted }: { initialKind?: PostKind; onPosted:
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (busy) return;
+    if (isBulk) return submitBulk();
     const native = mode === "native";
     const author = native ? normalizeHandle(handle) : tweet?.author_handle ?? linkHandle;
     if (native && handle.trim() && !author) return setError("Your X handle doesn't look right.");
@@ -232,9 +289,27 @@ function PostForm({ initialKind, onPosted }: { initialKind?: PostKind; onPosted:
 
       {mode === "x" ? (
         <>
-          <Field label="Link to your post on X">
-            <input type="url" inputMode="url" value={link} onChange={(e) => onLinkChange(e.target.value)} placeholder="https://x.com/you/status/…" className={inputCls} autoFocus />
-          </Field>
+          {isAdmin ? (
+            <Field label="X post link (admin: paste several, one per line)">
+              <textarea
+                value={link}
+                onChange={(e) => onLinkChange(e.target.value)}
+                rows={isBulk ? 6 : 2}
+                placeholder={"https://x.com/someone/status/…\nhttps://x.com/another/status/…"}
+                className={cx(inputCls, "resize-none font-mono text-sm")}
+                autoFocus
+              />
+            </Field>
+          ) : (
+            <Field label="Link to your post on X">
+              <input type="url" inputMode="url" value={link} onChange={(e) => onLinkChange(e.target.value)} placeholder="https://x.com/you/status/…" className={inputCls} autoFocus />
+            </Field>
+          )}
+          {isBulk && (
+            <p className="-mt-2 text-xs text-muted">
+              {bulkLinks.length} links. Each one is fetched and added with the post type below; any already on the wall are skipped.
+            </p>
+          )}
           {fetchState === "loading" && <p className="-mt-2 animate-pulse text-xs text-muted">Fetching the post…</p>}
           {duplicate && <DuplicateFlag post={duplicate} />}
           {fetchState === "done" && tweet && !duplicate && <TweetPreview tweet={tweet} />}
@@ -297,7 +372,7 @@ function TweetPreview({ tweet }: { tweet: TweetSnapshot }) {
 // Someone I met
 // ---------------------------------------------------------------------------
 
-function MetForm({ onPosted }: { onPosted: (p: Post) => void }) {
+function MetForm({ onPosted }: { onPosted: (p: Post, message?: string) => void }) {
   const [name, setName] = useState("");
   const [role, setRole] = useState("");
   const [company, setCompany] = useState("");
@@ -437,10 +512,13 @@ function MetForm({ onPosted }: { onPosted: (p: Post) => void }) {
 // Takeaway
 // ---------------------------------------------------------------------------
 
-function NoteForm({ initialTalk, onPosted }: { initialTalk?: string; onPosted: (p: Post) => void }) {
+function NoteForm({ initialTalk, onPosted }: { initialTalk?: string; onPosted: (p: Post, message?: string) => void }) {
+  const { isAdmin } = useShell();
   const [talk, setTalk] = useState(initialTalk ?? "");
   const [body, setBody] = useState("");
-  const [handle, setHandle] = useMyHandleField();
+  const [savedHandle] = useMyHandleField();
+  // Admin posts on someone's behalf: start empty instead of with your own handle.
+  const [handle, setHandle] = useState(isAdmin ? "" : savedHandle);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useFormError([talk, body, handle].join("\u0000"));
 
@@ -451,7 +529,13 @@ function NoteForm({ initialTalk, onPosted }: { initialTalk?: string; onPosted: (
     if (handle.trim() && !author) return setError("Your X handle doesn't look right.");
 
     setBusy(true);
-    const ok = await submitDraft({ ...EMPTY_POST, type: "note", author_handle: author, talk: talk || null, body: body.trim() || null }, setError, onPosted);
+    const ok = await submitDraft(
+      { ...EMPTY_POST, type: "note", author_handle: author, talk: talk || null, body: body.trim() || null },
+      setError,
+      onPosted,
+      undefined,
+      { asAdmin: isAdmin }
+    );
     if (!ok) setBusy(false);
   }
 
@@ -475,8 +559,8 @@ function NoteForm({ initialTalk, onPosted }: { initialTalk?: string; onPosted: (
           autoFocus
         />
       </Field>
-      <Field label="Your X handle (optional)">
-        <HandleInput value={handle} onChange={setHandle} placeholder="yourhandle" />
+      <Field label={isAdmin ? "Credit to (X handle of the person whose notes these are)" : "Your X handle (optional)"}>
+        <HandleInput value={handle} onChange={setHandle} placeholder={isAdmin ? "theirhandle" : "yourhandle"} />
       </Field>
       <FormFooter error={error} busy={busy} />
     </form>

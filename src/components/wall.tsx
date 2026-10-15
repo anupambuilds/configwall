@@ -45,9 +45,10 @@ export function Wall() {
   const sort = params.get("sort") === "top" ? "top" : "latest";
   const grouped = tab === "notes" && params.get("group") === "talk";
 
-  const { posts, pending, loading, error, flushPending } = usePosts({ holdRemote: true });
+  const { openAdd, isAdmin, showHidden } = useShell();
+  // Admin "Show hidden": deleted/hidden posts appear greyed with an Unhide strip.
+  const { posts, pending, loading, error, flushPending } = usePosts({ holdRemote: true, includeHidden: isAdmin && showHidden });
   const { votes, add: addVote } = useMyVotes();
-  const { openAdd } = useShell();
 
   // Animate only posts that arrive after the first load.
   const initialIds = useRef<Set<string> | null>(null);

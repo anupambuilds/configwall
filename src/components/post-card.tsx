@@ -26,14 +26,37 @@ interface CardProps {
  * - people we met (purple) and talk notes (yellow) share an editorial card.
  */
 export function PostCard(props: CardProps) {
-  switch (props.post.type) {
-    case "post":
-      return <XStyleCard {...props} />;
-    case "met":
-      return <MetCard {...props} />;
-    case "note":
-      return <NoteCard {...props} />;
+  const card =
+    props.post.type === "post" ? <XStyleCard {...props} /> : props.post.type === "met" ? <MetCard {...props} /> : <NoteCard {...props} />;
+  if (!props.post.hidden) return card;
+  return <HiddenPost post={props.post}>{card}</HiddenPost>;
+}
+
+/** Admin-only view of a hidden/deleted post: greyed, with a one-tap restore. */
+function HiddenPost({ post, children }: { post: Post; children: React.ReactNode }) {
+  const { toast } = useShell();
+  const [busy, setBusy] = useState(false);
+  async function restore() {
+    setBusy(true);
+    try {
+      await getStore().setHidden(post.id, false);
+      toast("Post restored to the wall");
+    } catch {
+      toast("Couldn't restore the post. Try again.");
+      setBusy(false);
+    }
   }
+  return (
+    <div className="overflow-hidden rounded-2xl border-2 border-dashed border-ink/25">
+      <div className="flex items-center gap-2 bg-ink/5 px-3 py-2 text-xs">
+        <span className="font-semibold">Hidden from the wall</span>
+        <button onClick={restore} disabled={busy} className="ml-auto rounded-full bg-ink px-3 py-1 font-semibold text-paper disabled:opacity-60">
+          {busy ? "Restoring…" : "Unhide"}
+        </button>
+      </div>
+      <div className="pointer-events-none opacity-50 grayscale [&>article]:rounded-none [&>article]:border-0">{children}</div>
+    </div>
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -268,6 +291,8 @@ function CardFooter({
   viewOnX?: string | null;
 }) {
   const mine = useMyPostIds().has(post.id);
+  const { isAdmin, readOnly } = useShell();
+  const canDelete = !post.hidden && (isAdmin || (mine && !readOnly));
   return (
     <footer className="mt-3 flex items-center gap-2 px-4 pb-3 text-xs text-muted">
       {showAuthor &&
@@ -293,15 +318,19 @@ function CardFooter({
         )}
         <ShareButton id={post.id} />
         <UpvoteButton post={post} voted={voted} onVoted={onVoted} />
-        {mine && <PostMenu postId={post.id} />}
+        {canDelete && <PostMenu postId={post.id} mine={mine} />}
       </span>
     </footer>
   );
 }
 
-/** Kebab menu on posts made from this device: delete (removes it from the wall), with an inline confirm step. */
-function PostMenu({ postId }: { postId: string }) {
-  const { toast } = useShell();
+/**
+ * Kebab menu with delete (removes the post from the wall), inline confirm.
+ * Shown on your own posts, and on every post in admin mode.
+ */
+function PostMenu({ postId, mine }: { postId: string; mine: boolean }) {
+  const { toast, isAdmin } = useShell();
+  const asAdmin = isAdmin && !mine;
   const [open, setOpen] = useState(false);
   const [confirming, setConfirming] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -329,9 +358,13 @@ function PostMenu({ postId }: { postId: string }) {
   async function remove() {
     setBusy(true);
     try {
-      await getStore().deletePost(postId);
-      forgetMyPost(postId);
-      toast("Post deleted");
+      if (asAdmin) {
+        await getStore().setHidden(postId, true);
+      } else {
+        await getStore().deletePost(postId);
+        forgetMyPost(postId);
+      }
+      toast(asAdmin ? "Post removed from the wall (restore it with Show hidden)" : "Post deleted");
     } catch (e) {
       toast(e instanceof Error ? e.message : "Couldn't delete the post. Try again.");
       setBusy(false);
@@ -361,7 +394,7 @@ function PostMenu({ postId }: { postId: string }) {
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                 <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" />
               </svg>
-              Delete post
+              {asAdmin ? "Delete post (admin)" : "Delete post"}
             </button>
           ) : (
             <div className="p-2">

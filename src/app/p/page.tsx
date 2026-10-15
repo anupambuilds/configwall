@@ -18,6 +18,7 @@ function SinglePost() {
     const store = getStore();
     store.getPost(id).then(setPost);
     return store.subscribe((e) => {
+      if (e.kind === "settings") return;
       if (e.kind === "delete") {
         if (e.id === id) setPost(null);
       } else if (e.post.id === id) setPost(e.post.hidden ? null : e.post);

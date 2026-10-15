@@ -167,15 +167,23 @@ Everyone engaging with the wall, with their metrics. **No leaderboard:** no rank
 ### 3.6 Single entry — `/p/?id=…`
 - One entry, full width, with "Featured on the Config BLR Wall" copy. This is the target of every card's link button and of every "Post on X" link.
 
-### 3.7 Admin — `/admin/`
-- **Locked by an admin secret.** `/admin/` shows only an **"Admin secret"** box and **Unlock**. Paste the secret once per device; it's remembered until you tap **Lock**. A remembered secret is re-checked on every visit, and a wrong or changed secret locks the page again.
-- **The server checks the secret on every admin action** (step 2): it's stored in Supabase, never in the website's code, the repo, or chat. Live builds stay locked for everyone until that server check exists. Locally the secret is `local-admin` (mock data only).
-- If the secret leaks: generate a new one; the old one stops working immediately.
-- **What admin can do** (others can't):
-  - **Bulk seed posts:** paste X post URLs (one per line or space-separated), choose the post type for the batch. Each tweet is fetched and saved; duplicates are skipped.
-  - **Quick add notes:** talk notes credited to any handle.
-  - **Moderate:** see **all** posts including hidden and deleted ones, search (including tweet text), filter to hidden only, **Hide / Unhide** any post (restores deleted posts too).
-  - Overview counts (total, hidden, seeds); **Reset mock data** (local only).
+### 3.7 Admin mode (on the wall)
+Admin uses the **same wall as everyone**, with extra powers.
+
+**Unlocking:** `/admin/` shows an **"Admin secret"** box → **Unlock**. The device remembers it until **Lock**; a remembered secret is re-checked on every visit. Live, the server checks the secret on every admin action (step 2); until that exists, live builds stay locked. Locally the secret is `local-admin`. If it leaks, generate a new one; the old one stops working.
+
+**While unlocked**, a dark **admin bar** sits under the nav on every page: **ADMIN** badge · **Show hidden** toggle · **Read-only** switch · **Lock**.
+
+| # | Power | How |
+|---|---|---|
+| 1 | **Delete any post** | Every post's ⋮ menu shows **Delete post (admin)** (your own posts show the normal Delete). Soft delete: hidden, restorable. |
+| 2 | **Post any tweet, several at once** | The Post form's X link box accepts **several links** (one per line). Each is fetched and added with the chosen post type, credited to its author; ones already on the wall are skipped; a toast reports "Added N posts (skipped: …)". Admin posts are marked as seeds and aren't rate-limited. |
+| 3 | **See and restore hidden posts** | **Show hidden** adds deleted/hidden posts to the wall, greyed inside a dashed frame with a "Hidden from the wall · **Unhide**" strip. |
+| 4 | **Admin badge + Lock** | The admin bar shows you're in admin mode; **Lock** leaves it (and forgets the secret on this device). |
+| 5 | **Talk notes on someone's behalf** | In admin mode the notes form's handle field becomes **"Credit to (X handle…)"**, empty by default; the notes are credited to that person and don't change your saved handle. |
+| 9 | **Read-only switch** | Pauses posting and deleting **for everyone except admin**, live on every open screen. Visitors see "Posting is paused right now. You can still browse and upvote."; add cards and the + button show a "paused" toast; ⋮ Delete disappears for non-admins. Stored in a one-row `settings` table (public read, admin-only write). |
+
+`/admin/` itself, once unlocked, only explains admin mode with **Go to the wall**, **Lock** and (local only) **Reset mock data**. The old back-office tabs (bulk seed, quick add, moderate list) were replaced by the above.
 
 ### 3.8 Visual style
 - **Paper** design: Instrument Serif headlines, Geist body text.
@@ -365,6 +373,11 @@ votes (post_id uuid references posts, device_id text, primary key (post_id, devi
 ## 7. Change log
 
 Newest first. The sections above always describe the current product; this log records what changed and why.
+
+### 2026-10-15 — Admin mode on the wall
+- Admin is now the **same wall with extra powers**, via a dark admin bar (ADMIN · Show hidden · Read-only · Lock): delete any post, see and **Unhide** hidden posts on the wall, paste **several X links at once** in the Post form, add talk notes **credited to any handle**, and a **read-only switch** that pauses posting/deleting for everyone else live.
+- `/admin/` is now just the unlock screen (and a short explainer once unlocked); the old back-office tabs are gone.
+- New migration `0003_settings.sql` (one-row `settings` table with `read_only`, public read, realtime), applied to the **test** project only.
 
 ### 2026-10-15 — Admin unlocked with a secret
 - `/admin/` no longer uses a `?key=` link. It shows an **"Admin secret"** box: paste once per device, **Unlock**, and it's remembered until **Lock**. Live builds verify the secret on the server (step 2) and stay locked until then; locally the secret is `local-admin`.

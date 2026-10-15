@@ -25,6 +25,8 @@ export interface TweetSnapshot {
   author_avatar: string | null;
   created_at: string;
   photos: string[];
+  /** Video or GIF (mp4 + poster frame), played inline on the card. */
+  videos?: { poster: string; src: string }[];
   /** Handles mentioned in the tweet (without @). */
   mentions: string[];
 }

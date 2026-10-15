@@ -22,11 +22,11 @@ export function xTextFor(post: Post): string {
     case "met": {
       const who = [post.met_name, post.met_handle && `(@${post.met_handle})`].filter(Boolean).join(" ") || "someone great";
       const what = [post.met_role, post.met_company].filter(Boolean).join(" at ");
-      const head = `Met ${who}${what ? `, ${what},` : ""} at Config BLR.`;
+      const head = `Met ${who}${what ? `, ${what},` : ""} at Figma Config BLR.`;
       return `${head} ${clip(post.body ?? "", 225 - head.length)}`;
     }
     case "note": {
-      const head = `My notes from "${post.talk}" at Config BLR: `;
+      const head = `My notes from "${post.talk}" at Figma Config BLR: `;
       return head + clip(post.body ?? "", 235 - head.length);
     }
   }

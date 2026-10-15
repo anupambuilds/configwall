@@ -375,6 +375,15 @@ votes (post_id uuid references posts, device_id text, primary key (post_id, devi
 
 Newest first. The sections above always describe the current product; this log records what changed and why.
 
+### 2026-10-15 — Backend live: Mumbai projects, server functions, real data
+- Recreated both Supabase projects in **Mumbai** (`ap-south-1`): test `qhgbroeuqxdnybkryrfm`, production `grcvftfxgtqoiqzeevsv`. Migrations 0001–0006 applied to both.
+- **Server functions** (Edge Functions) for every write: create-post (validation, read-only, 10 posts / 10 min, double-submit protection, **X handle must exist**, server-side tweet fetch incl. **video**, one entry per tweet / restore deleted), resolve-tweet, delete-post (poster’s device or admin, 20 deletes / 10 min), upload-url (signed photo uploads), admin (verify, hide/restore, read-only, list hidden). Admin secret stored as a function secret.
+- **Live updates** via database-triggered broadcast signals; browsers re-read the post (forged signals can’t inject content).
+- The site now uses the **real database** whenever a build has Supabase settings (local dev and the test site use the test project). Mock data only without settings.
+- **Real talk list** (16 talks, Oct 15, Main Stage + Leadership Collective Lounge) with **speakers** shown in pickers, note cards and group headings.
+- Share texts say **"Figma Config BLR"**; tweet **videos** play inline; tweets older than a month show a date.
+- Verified: 35/35 backend checks + live-update check on test **and** production; screenshot of the site on real data.
+
 ### 2026-10-15 — Header and footer copy
 - Heading copy now ends "Built by @_anupambhowmick." and the nav no longer shows the "Unofficial" tag.
 - Footer: the DM line and "Unofficial community project. Not affiliated with Figma." are one line; the privacy line is removed.

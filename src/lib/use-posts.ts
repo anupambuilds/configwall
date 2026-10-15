@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { getStore } from "./store";
 import type { Post } from "./types";
 
@@ -15,6 +15,11 @@ export function usePosts(opts?: { includeHidden?: boolean; holdRemote?: boolean 
   const [pending, setPending] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // Ids already on screen, so a live signal for a post we already show (e.g. our own) never becomes "1 new post".
+  const shown = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    shown.current = new Set(posts.map((p) => p.id));
+  }, [posts]);
 
   useEffect(() => {
     const store = getStore();
@@ -34,8 +39,14 @@ export function usePosts(opts?: { includeHidden?: boolean; holdRemote?: boolean 
         return;
       }
       if (e.kind === "insert") {
-        if (holdRemote && !e.fromThisTab) setPending((q) => [e.post, ...q]);
-        else setPosts((prev) => [e.post, ...prev.filter((x) => x.id !== e.post.id)]);
+        // Our own post: show it now and drop any copy the live signal already queued.
+        if (!holdRemote || e.fromThisTab || shown.current.has(e.post.id)) {
+          setPending((q) => q.filter((x) => x.id !== e.post.id));
+          setPosts((prev) => [e.post, ...prev.filter((x) => x.id !== e.post.id)]);
+        } else {
+          // Someone else's post: hold it behind the "N new posts" pill (once).
+          setPending((q) => [e.post, ...q.filter((x) => x.id !== e.post.id)]);
+        }
         return;
       }
       const visible = includeHidden || !e.post.hidden;

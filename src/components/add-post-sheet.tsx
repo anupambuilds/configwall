@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useEffectEvent, useRef, useState } from "react";
-import { MAX_BODY, MAX_LONG, TALKS } from "@/lib/config";
+import { MAX_BODY, MAX_LONG, TALK_LIST } from "@/lib/config";
 import { getMyHandle, rememberMyPost, setMyHandle } from "@/lib/identity";
 import { compressImage } from "@/lib/image";
 import { DuplicatePostError, getStore } from "@/lib/store";
@@ -552,8 +552,10 @@ function NoteForm({ initialTalk, onPosted }: { initialTalk?: string; onPosted: (
       <Field label="Which talk?">
         <select value={talk} onChange={(e) => setTalk(e.target.value)} className={inputCls}>
           <option value="">Pick a talk</option>
-          {TALKS.map((t) => (
-            <option key={t}>{t}</option>
+          {TALK_LIST.map((t) => (
+            <option key={t.title} value={t.title}>
+              {t.title} · {t.speakers}
+            </option>
           ))}
         </select>
       </Field>

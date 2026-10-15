@@ -158,9 +158,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <Link href="/" className="shrink-0 font-serif text-lg leading-none tracking-tight sm:text-xl">
             Figma Config BLR Wall
           </Link>
-          <span className="hidden rounded-full border border-ink/15 px-2 py-0.5 text-[10px] font-medium tracking-wider text-muted uppercase sm:inline">
-            Unofficial
-          </span>
           <div className="ml-auto flex items-center gap-0.5 text-[13px] sm:gap-1 sm:text-sm">
             {NAV.map((n) => (
               <Link
@@ -289,10 +286,8 @@ function SiteFooter() {
         <a href={`https://x.com/${BUILDER_HANDLE}`} target="_blank" rel="noopener noreferrer" className="font-medium text-ink underline underline-offset-2">
           DM me on X
         </a>
-        .
+        . Unofficial community project. Not affiliated with Figma.
       </p>
-      <p className="mt-1 text-xs">Unofficial community project. Not affiliated with Figma.</p>
-      <p className="mt-1 text-xs">Privacy: we keep a random device ID for votes, deletes and spam protection. No accounts, no personal data.</p>
     </footer>
   );
 }

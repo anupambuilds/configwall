@@ -25,7 +25,7 @@ The builder was not at the event, so the product is **online-first**: it pulls t
 
 ### Ground rules
 
-- **Unofficial.** No Figma or Config logos, colours or branding. "Unofficial" is visible in the header and on the share card.
+- **Unofficial.** No Figma or Config logos, colours or branding. "Unofficial community project. Not affiliated with Figma." is in the footer on every page, and "Unofficial" is on the Config card.
 - **Credit everyone.** Every entry shows an author handle (or "Anonymous"). Shared posts link to the original tweet.
 - **Never invent content.** Seeds are real, credited posts. Mock data exists only for local development and uses obvious `demo_` handles.
 
@@ -44,7 +44,8 @@ The builder was not at the event, so the product is **online-first**: it pulls t
 ## 3. Features
 
 ### 3.1 Feed — `/`
-- Header: title, "What Bangalore designers took away from Config: the posts, the people, the talk notes. Unofficial, built by @handle", live counter (`N posts · M people`).
+- Header: title "Figma Config BLR Wall", "What Bangalore designers took away from Config: the posts, the people, the talk notes. Built by @_anupambhowmick.", live counter (`N posts · M people`). The nav shows only the name, Wall and People (no "Unofficial" tag).
+- Footer (every page except admin): "N visitors · @_anupambhowmick · Built with Claude Code", then one line: "Questions, or want something taken down? **DM me on X**. Unofficial community project. Not affiliated with Figma."
 - **Counters** (tab counts and the header’s posts/people): exact up to 100, then rounded down in steps of 50: 100+, 150+, 200+, 250+…
 - **Tabs** (each with a count): **All** · **Posts** · **People we met** · **Talk notes**.
   - **All**: everything mixed, newest first. No filters.
@@ -158,7 +159,7 @@ Everyone engaging with the wall, with their metrics. **No leaderboard:** no rank
 
 ### 3.5 Config card — side panel (`/people/?card=x:handle`)
 - Opens from the People directory, a person's page, or "Make your card" after posting. It's in the URL, so the link can be shared and opens straight to the card.
-- **1080×1350 card:** "My Config BLR" + "Unofficial" badge; name, @handle and designation at company; metrics (**posts · people met · upvotes**); the person's **top post** (most upvoted). If nothing has upvotes yet, it shows their **latest post** instead and is labelled accordingly. Footer with the site URL.
+- **1080×1350 card:** "Figma Config BLR Wall" + "Unofficial" badge; name, @handle and designation at company; metrics (**posts · people met · upvotes**); the person's **top post** (most upvoted). If nothing has upvotes yet, it shows their **latest post** instead and is labelled accordingly. Footer with the site URL.
 - **Save image:** PNG made on the device (`html-to-image`); on phones it opens the native share sheet.
 - **Share on X:** opens X with "@handle's Config BLR in one card. Add yours:" and the card link.
 - **Open the top/latest post →** goes to that post's page.
@@ -373,6 +374,10 @@ votes (post_id uuid references posts, device_id text, primary key (post_id, devi
 ## 7. Change log
 
 Newest first. The sections above always describe the current product; this log records what changed and why.
+
+### 2026-10-15 — Header and footer copy
+- Heading copy now ends "Built by @_anupambhowmick." and the nav no longer shows the "Unofficial" tag.
+- Footer: the DM line and "Unofficial community project. Not affiliated with Figma." are one line; the privacy line is removed.
 
 ### 2026-10-15 — Launch decisions applied
 - Site name is now **Figma Config BLR Wall** (nav, title, header, Config card, share sheet).

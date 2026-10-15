@@ -106,7 +106,7 @@ export function Wall() {
         </h1>
         <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-muted sm:text-base">
           What Bangalore designers took away from Config: the posts, the people, the talk notes.{" "}
-          <span className="text-ink">Unofficial</span>, built by{" "}
+          Built by{" "}
           <a href={`https://x.com/${BUILDER_HANDLE}`} target="_blank" rel="noopener noreferrer" className="text-ink underline decoration-line underline-offset-4 hover:decoration-ink">
             @{BUILDER_HANDLE}
           </a>

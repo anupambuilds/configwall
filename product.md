@@ -143,7 +143,7 @@ Everyone engaging with the wall, with their metrics. **No leaderboard:** no rank
 - Name, @handle, designation at company; **card icon** (Config card), X profile and LinkedIn buttons.
 - Metric tiles: Posts, People met, Upvotes.
 - "Met" chips linking to each connection.
-- **Activity:** everything they posted, plus met cards about them, newest first.
+- **Activity:** starts with an **Add to the wall** card (opens the type picker), then everything they posted plus met cards about them, newest first.
 
 **Identity and connections**
 - People are identified by X handle, otherwise LinkedIn profile, otherwise the typed name. Someone added by name now and by handle later shows up as two entries; the form nudges people to add a handle.
@@ -342,6 +342,9 @@ votes (post_id uuid references posts, device_id text, primary key (post_id, devi
 ## 7. Change log
 
 Newest first. The sections above always describe the current product; this log records what changed and why.
+
+### 2026-10-15 — Add card on person pages
+- The Activity section of every person page now starts with the **Add to the wall** card (opens the type picker). The add card is now a shared component used by the feed and People.
 
 ### 2026-10-15 — Repo and Supabase project
 - Code pushed to https://github.com/anupambuilds/configwall; Supabase project `olmdpakuiawvtiolbhne` created. Site base path will be `/configwall`.

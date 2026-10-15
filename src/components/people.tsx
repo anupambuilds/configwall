@@ -9,6 +9,7 @@ import type { Post } from "@/lib/types";
 import { useMyVotes, usePosts } from "@/lib/use-posts";
 import { cx, normalizeHandle, timeAgo } from "@/lib/util";
 import { useShell } from "./app-shell";
+import { AddCard } from "./add-card";
 import { ConfigCardPanel, personPosts } from "./config-card";
 import { CardIcon, XLogo } from "./icons";
 import { Masonry } from "./masonry";
@@ -224,6 +225,7 @@ function PersonDetail({
   onOpenCard: (key: string) => void;
 }) {
   const { votes, add } = useMyVotes();
+  const { openAdd } = useShell();
   const person = people.find((p) => p.key === personKey);
   const byKey = useMemo(() => new Map(people.map((p) => [p.key, p])), [people]);
   const activity = useMemo(() => (person ? personPosts(posts, person) : []), [posts, person]);
@@ -301,11 +303,12 @@ function PersonDetail({
       )}
 
       <h2 className="mt-10 mb-4 border-b border-line pb-2 font-serif text-3xl">Activity</h2>
-      {!loading && activity.length === 0 ? (
-        <p className="text-muted">Nothing from {title} on the wall yet.</p>
-      ) : (
-        <Masonry items={[...activity].sort((a, b) => b.created_at.localeCompare(a.created_at))} render={(p) => <PostCard post={p} voted={votes.has(p.id)} onVoted={add} />} />
-      )}
+      <Masonry
+        items={[...activity].sort((a, b) => b.created_at.localeCompare(a.created_at))}
+        render={(p) => <PostCard post={p} voted={votes.has(p.id)} onVoted={add} />}
+        lead={<AddCard title="Add to the wall" sub="A post, someone you met, or talk notes" onClick={() => openAdd()} />}
+      />
+      {!loading && activity.length === 0 && <p className="mt-4 text-sm text-muted">Nothing from {title} on the wall yet.</p>}
     </main>
   );
 }

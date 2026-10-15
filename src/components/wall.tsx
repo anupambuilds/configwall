@@ -7,6 +7,7 @@ import { derivePeople } from "@/lib/people";
 import { KIND_LABELS, POST_KINDS, type Post, type PostKind, type PostType } from "@/lib/types";
 import { useMyVotes, usePosts } from "@/lib/use-posts";
 import { cx, formatCount } from "@/lib/util";
+import { AddCard } from "./add-card";
 import { useShell } from "./app-shell";
 import { Masonry } from "./masonry";
 import { PostCard } from "./post-card";
@@ -81,7 +82,7 @@ export function Wall() {
   );
 
   const add = () => openAdd(TAB_ADD_TYPE[tab], { talk: talk || undefined, kind: kind ?? undefined });
-  const addCard = <AddCard tab={tab} kind={kind} talk={talk} onClick={add} />;
+  const addCard = <TabAddCard tab={tab} kind={kind} talk={talk} onClick={add} />;
 
   function showNew() {
     flushPending();
@@ -239,7 +240,7 @@ export function Wall() {
 }
 
 /** The first card on every tab: opens the add flow for that tab's type. */
-function AddCard({ tab, kind, talk, onClick }: { tab: TabKey; kind: PostKind | null; talk: string; onClick: () => void }) {
+function TabAddCard({ tab, kind, talk, onClick }: { tab: TabKey; kind: PostKind | null; talk: string; onClick: () => void }) {
   const copy: Record<TabKey, [string, string]> = {
     all: ["Add to the wall", "A post, someone you met, or talk notes"],
     posts: [kind ? `Add a ${KIND_LABELS[kind].toLowerCase()}` : "Add a post", "Paste your X link, or write one here"],
@@ -247,20 +248,7 @@ function AddCard({ tab, kind, talk, onClick }: { tab: TabKey; kind: PostKind | n
     notes: ["Add talk notes", talk ? `For “${talk}”` : "Your notes from one of the talks"],
   };
   const [title, sub] = copy[tab];
-  return (
-    <button
-      onClick={onClick}
-      className="group flex w-full items-center gap-3 rounded-2xl border-2 border-dashed border-line bg-card/60 p-4 text-left transition-colors hover:bg-ink/5"
-    >
-      <span className="grid size-10 shrink-0 place-items-center rounded-full bg-accent text-xl leading-none text-accent-ink transition-transform group-hover:scale-105" aria-hidden>
-        +
-      </span>
-      <span className="min-w-0">
-        <span className="block font-semibold">{title}</span>
-        <span className="block truncate text-sm text-muted">{sub}</span>
-      </span>
-    </button>
-  );
+  return <AddCard title={title} sub={sub} onClick={onClick} />;
 }
 
 const EMPTY_COPY: Record<TabKey, { title: string; cta: string }> = {

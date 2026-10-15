@@ -117,6 +117,6 @@ Changing the model? Update `types.ts`, `EMPTY_POST`, `db.ts`, a **new** migratio
 - Primary colour near-black `#1c1b19` on off-white `#f5f2ea`; green "Live" dot; add cards tint grey on hover.
 - After posting: close the sheet, toast "Post is being added to the wall", go to the wall. Posting to X is the 𝕏 button on each card.
 - A tweet is on the wall once: duplicates are keyed by tweet id (`tweetIdFromUrl`); the form flags "Already on the wall" on paste and on submit (`DuplicatePostError`); re-sharing a deleted one restores it.
-- Every post has a ⋮ menu with Delete (inline confirm). Anyone can delete any post (no logins/ownership); delete is a soft delete (`hidden`), restorable by admin. The server must rate-limit deletes and record who deleted.
+- Only the poster can delete: posts created on this device (ids in localStorage `cbw:mine`) get a ⋮ menu with Delete (inline confirm). The server must verify the caller's device id equals the post's `device_id`. Soft delete (`hidden`), restorable by admin.
 - Text fields show focus by darkening their border only (no outline ring); don't add focus rings to inputs.
 - Use tokens (`bg-paper`, `text-ink`, `bg-met-bg`, …), never raw hex in components (exception: LinkedIn blue).

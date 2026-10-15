@@ -1,6 +1,6 @@
 "use client";
 
-import { getDeviceId } from "./identity";
+import { getDeviceId, readMyPostIds } from "./identity";
 import { buildMockSeed, MOCK_TWEETS } from "./mock-seed";
 import type { NewPost, Post, TweetSnapshot } from "./types";
 import { tweetIdFromUrl } from "./util";
@@ -25,9 +25,11 @@ export interface Store {
   myVotes(): Promise<Set<string>>;
   setHidden(postId: string, hidden: boolean): Promise<void>;
   /**
-   * Removes a post from the wall for everyone. Anyone can delete any post (no
-   * logins). It's a soft delete (hidden), so admin can restore it from Moderate.
-   * Backend: an Edge Function that rate-limits deletes per device and records who deleted it.
+   * Removes a post from the wall for everyone. Only the device that posted it
+   * can delete it (no logins: "the poster" = their device). Soft delete
+   * (hidden), so admin can restore it from Moderate.
+   * Backend: an Edge Function that deletes only when the caller's device id
+   * matches the post's private device_id.
    */
   deletePost(postId: string): Promise<void>;
   /** Records this device's visit; returns the unique visitor count. */
@@ -187,6 +189,7 @@ function createMockStore(): Store {
 
     async deletePost(postId) {
       await delay(150);
+      if (!readMyPostIds().has(postId)) throw new Error("Only the person who posted this can delete it.");
       const posts = all();
       const post = posts.find((x) => x.id === postId);
       if (!post) return;

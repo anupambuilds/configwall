@@ -56,6 +56,58 @@ export function useMyHandle(): string | null {
   return useSyncExternalStore(subscribeHandle, getMyHandle, () => null);
 }
 
+// ---------------------------------------------------------------------------
+// Posts created on this device. With no logins, "the person who posted" =
+// "the device they posted from". Only those posts show Delete; the server
+// re-checks the device id against the post's private device_id.
+// ---------------------------------------------------------------------------
+export const MINE_KEY = "cbw:mine";
+const MINE_EVENT = "cbw:mine-change";
+let mineCache: { raw: string | null; ids: Set<string> } = { raw: null, ids: new Set() };
+
+export function readMyPostIds(): Set<string> {
+  const raw = safeGet(MINE_KEY);
+  if (raw !== mineCache.raw) {
+    let ids: string[] = [];
+    try {
+      ids = raw ? (JSON.parse(raw) as string[]) : [];
+    } catch {}
+    mineCache = { raw, ids: new Set(ids) };
+  }
+  return mineCache.ids;
+}
+
+function writeMine(ids: Set<string>) {
+  safeSet(MINE_KEY, JSON.stringify([...ids]));
+  window.dispatchEvent(new Event(MINE_EVENT));
+}
+
+export function rememberMyPost(id: string) {
+  writeMine(new Set(readMyPostIds()).add(id));
+}
+
+export function forgetMyPost(id: string) {
+  const next = new Set(readMyPostIds());
+  next.delete(id);
+  writeMine(next);
+}
+
+function subscribeMine(cb: () => void) {
+  window.addEventListener("storage", cb);
+  window.addEventListener(MINE_EVENT, cb);
+  return () => {
+    window.removeEventListener("storage", cb);
+    window.removeEventListener(MINE_EVENT, cb);
+  };
+}
+
+const NO_POSTS = new Set<string>();
+
+/** Ids of posts created on this device (empty during prerender). */
+export function useMyPostIds(): Set<string> {
+  return useSyncExternalStore(subscribeMine, readMyPostIds, () => NO_POSTS);
+}
+
 const noopSubscribe = () => () => {};
 
 /** False during prerender/hydration, true once running in the browser. */

@@ -125,10 +125,11 @@ Required: name **or** X handle **or** LinkedIn, plus the conversation and your h
 - Required-field validation, character counters, and a basic profanity / link-spam check.
 - twitter.com links are normalised to x.com.
 
-**Deleting posts**
-- **Every post** has a **⋮ (kebab) menu** in the card footer → **Delete post** → inline confirm ("Delete this post? It will be removed from the wall for everyone.") → Cancel / Delete → toast "Post deleted". It disappears live for everyone.
-- No logins and no ownership: anyone can delete any post. People on the wall are just the X accounts that shared posts.
-- Delete is a **soft delete** (the post is hidden, not erased), so admin can restore it from Moderate → Unhide if something is deleted by mistake or abuse. The server function will rate-limit deletes per device and record who deleted what.
+**Deleting posts (only the poster)**
+- **Only the person who posted can delete it.** With no logins, "the poster" = **the device and browser they posted from**. Posts made from this device show a **⋮ (kebab) menu** in the card footer → **Delete post** → inline confirm ("Delete this post? It will be removed from the wall for everyone.") → Cancel / Delete → toast "Post deleted". It disappears live for everyone.
+- How it's enforced: each device has a random private id; it's stored with the post in a column the public can't read, and the device remembers its own post ids. The server deletes only when the requesting device's id matches the post's.
+- Limits: deleting must happen from the same phone/browser used to post; clearing browser data or a private window loses that ability; admin-seeded posts have no owner device. **Admin can remove or restore anything** from Moderate.
+- Delete is a **soft delete** (the post is hidden, not erased), restorable by admin.
 
 **After posting**
 - The sheet closes, a toast says **"Post is being added to the wall"**, and you're taken to the wall (the feed, scrolled to the top, where your post appears). No success screen.
@@ -360,6 +361,9 @@ votes (post_id uuid references posts, device_id text, primary key (post_id, devi
 ## 7. Change log
 
 Newest first. The sections above always describe the current product; this log records what changed and why.
+
+### 2026-10-15 — Only the poster can delete
+- Delete is back to **owner-only**: the ⋮ → Delete menu shows only on posts made from this device, and the store refuses deletes from other devices. When live, the server checks the device id against the post's private `device_id`. Still a soft delete; admin can remove or restore any post.
 
 ### 2026-10-15 — Max 3 columns
 - The feed (and person activity) now caps at **3 columns** on desktop (was 4), with 2 columns from 640px and 1 below. Cards get ~290–330px of content width on desktop, so embedded tweets are no longer cramped.

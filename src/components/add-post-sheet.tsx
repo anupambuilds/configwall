@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { MAX_BODY, MAX_LONG, TALKS } from "@/lib/config";
-import { getMyHandle, setMyHandle } from "@/lib/identity";
+import { getMyHandle, rememberMyPost, setMyHandle } from "@/lib/identity";
 import { compressImage } from "@/lib/image";
 import { DuplicatePostError, getStore } from "@/lib/store";
 import { EMPTY_POST, KIND_LABELS, MAX_MET_PHOTOS, POST_KINDS, type NewPost, type Post, type PostKind, type PostType, type TweetSnapshot } from "@/lib/types";
@@ -112,6 +112,7 @@ async function submitDraft(
   }
   try {
     const post = await getStore().createPost(draft);
+    rememberMyPost(post.id);
     if (draft.author_handle && (draft.type !== "post" || draft.source === "native")) setMyHandle(draft.author_handle);
     onPosted(post);
     return true;

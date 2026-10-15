@@ -351,6 +351,11 @@ votes (post_id uuid references posts, device_id text, primary key (post_id, devi
 
 Newest first. The sections above always describe the current product; this log records what changed and why.
 
+### 2026-10-15 — Go-live audit, CLAUDE.md, X embed fix
+- Fixed X posts stuck on "Loading post from X…": the embed target was hidden while loading (X never reports it rendered), and nothing timed out. It now loads in a laid-out, invisible box and falls back to a "View on X" card after 10 s.
+- Added `docs/go-live.md`: every piece of data on every page and form mapped to its source, launch blockers, and the step-by-step plan with a test checklist. Verified that X’s tweet endpoint works but blocks browsers (CORS), so tweets must be fetched by a server function.
+- Added `CLAUDE.md`: rules, tech stack, environments, architecture, data mapping and ways of working.
+
 ### 2026-10-15 — No success modal after posting
 - Submitting any post now closes the sheet, shows "Post is being added to the wall" and takes you to the wall. The success screen (Post on X / Make your card / Done) is removed; the 𝕏 button on each card still posts it to X.
 

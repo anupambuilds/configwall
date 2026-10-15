@@ -1,0 +1,20 @@
+# Free Supabase projects pause after ~7 days without activity. This makes one
+# tiny read per day on both projects (public settings row) so the wall stays up.
+name: Keep databases awake
+
+on:
+  schedule:
+    - cron: "17 3 * * *" # daily, 08:47 IST
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping production
+        run: curl -fsS "https://grcvftfxgtqoiqzeevsv.supabase.co/rest/v1/settings?select=read_only" -H "apikey: sb_publishable_Ye6wgikAVI3J9xQTIG_Tbw_tzoNtp6t"
+      - name: Ping test
+        run: curl -fsS "https://qhgbroeuqxdnybkryrfm.supabase.co/rest/v1/settings?select=read_only" -H "apikey: sb_publishable_YouM-R3ADxP8X6S-2raTTQ_yJ3voRxy"

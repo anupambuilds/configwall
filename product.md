@@ -375,6 +375,11 @@ votes (post_id uuid references posts, device_id text, primary key (post_id, devi
 
 Newest first. The sections above always describe the current product; this log records what changed and why.
 
+### 2026-10-16 — Production launch
+- `production` branch created from `main`: the public site https://anupambuilds.github.io/configwall/ now serves the real wall on the production database.
+- Daily keep-alive workflow (`.github/workflows/keepalive.yml`) reads one public row on both projects so the free databases don’t pause.
+- QA: 31/31 journeys pass on the live test site.
+
 ### 2026-10-16 — QA pass, retry fix, test site live
 - Added `scripts/qa-ui.mjs`: 31 real user journeys driven in Microsoft Edge (two browsers for live updates, admin mode, phone width). **31/31 pass** on local + test database.
 - QA found an intermittent blocked request (gateway cold start, reported by browsers as CORS). Server-function calls now **retry twice** on network/gateway errors; safe because every submit has an idempotency key.

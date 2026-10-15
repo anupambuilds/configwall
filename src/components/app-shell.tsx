@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
-import { APP_ENV } from "@/lib/config";
-import { DATA_SOURCE } from "@/lib/store";
+import { APP_ENV, BUILDER_HANDLE } from "@/lib/config";
+import { formatCount } from "@/lib/util";
+import { DATA_SOURCE, getStore } from "@/lib/store";
 import type { PostKind, PostType } from "@/lib/types";
 import { cx } from "@/lib/util";
 import { AddPostSheet } from "./add-post-sheet";
@@ -99,6 +100,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </nav>
 
       <div className="flex flex-1 flex-col">{children}</div>
+      {!isAdmin && <SiteFooter />}
 
       {toastMsg && (
         <div
@@ -135,5 +137,37 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         />
       )}
     </ShellContext.Provider>
+  );
+}
+
+function SiteFooter() {
+  const [visitors, setVisitors] = useState<number | null>(null);
+  useEffect(() => {
+    let alive = true;
+    getStore()
+      .recordVisit()
+      .then((n) => alive && setVisitors(n))
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, []);
+  return (
+    <footer className="border-t border-line px-4 py-6 text-center text-sm text-muted">
+      <p className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
+        <span>
+          <span className="font-semibold text-ink tabular-nums">{visitors === null ? "…" : formatCount(visitors)}</span> visitors
+        </span>
+        <span aria-hidden>·</span>
+        <a href={`https://x.com/${BUILDER_HANDLE}`} target="_blank" rel="noopener noreferrer" className="hover:text-ink hover:underline">
+          @{BUILDER_HANDLE}
+        </a>
+        <span aria-hidden>·</span>
+        <a href="https://claude.com/claude-code" target="_blank" rel="noopener noreferrer" className="hover:text-ink hover:underline">
+          Built with Claude Code
+        </a>
+      </p>
+      <p className="mt-1 text-xs">Unofficial community project. Not affiliated with Figma.</p>
+    </footer>
   );
 }

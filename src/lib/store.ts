@@ -16,6 +16,8 @@ export interface Store {
   upvote(postId: string): Promise<boolean>;
   myVotes(): Promise<Set<string>>;
   setHidden(postId: string, hidden: boolean): Promise<void>;
+  /** Records this device's visit; returns the unique visitor count. */
+  recordVisit(): Promise<number>;
   /** Public URL for an uploaded (already compressed) photo. */
   uploadPhoto(file: Blob): Promise<string>;
   /**
@@ -38,6 +40,7 @@ export type StoreEvent =
 
 const POSTS_KEY = "cbw:mock:posts:v4";
 const VOTES_KEY = "cbw:mock:votes:v4";
+const VISITS_KEY = "cbw:mock:visits:v1";
 
 function read<T>(key: string, fallback: T): T {
   try {
@@ -140,6 +143,13 @@ function createMockStore(): Store {
       );
     },
 
+    async recordVisit() {
+      const seen = new Set(read<string[]>(VISITS_KEY, []));
+      seen.add(getDeviceId());
+      write(VISITS_KEY, [...seen]);
+      return seen.size;
+    },
+
     async setHidden(postId, hidden) {
       await delay(80);
       const posts = all();
@@ -177,6 +187,7 @@ export function resetMockData() {
   try {
     localStorage.removeItem(POSTS_KEY);
     localStorage.removeItem(VOTES_KEY);
+    localStorage.removeItem(VISITS_KEY);
   } catch {}
 }
 

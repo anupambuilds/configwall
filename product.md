@@ -351,6 +351,10 @@ votes (post_id uuid references posts, device_id text, primary key (post_id, devi
 
 Newest first. The sections above always describe the current product; this log records what changed and why.
 
+### 2026-10-15 — Footer: visitors, builder handle, Built with Claude Code
+- Site footer on every page (except admin): unique visitor count (one per device, via `record_visit` RPC; migration `0002_visits.sql`, applied to the test project only), the builder’s X handle, and “Built with Claude Code”.
+- Still to do: real X handle in `NEXT_PUBLIC_BUILDER_HANDLE` (placeholder `yourhandle`); apply 0002 to production at go-live step 6.
+
 ### 2026-10-15 — Go-live audit, CLAUDE.md, X embed fix
 - Fixed X posts stuck on "Loading post from X…": the embed target was hidden while loading (X never reports it rendered), and nothing timed out. It now loads in a laid-out, invisible box and falls back to a "View on X" card after 10 s.
 - Added `docs/go-live.md`: every piece of data on every page and form mapped to its source, launch blockers, and the step-by-step plan with a test checklist. Verified that X’s tweet endpoint works but blocks browsers (CORS), so tweets must be fetched by a server function.

@@ -120,9 +120,10 @@ Required: name **or** X handle **or** LinkedIn, plus the conversation and your h
 - Required-field validation, character counters, and a basic profanity / link-spam check.
 - twitter.com links are normalised to x.com.
 
-**Deleting your own posts**
-- Posts made from this device show a **⋮ (kebab) menu** in the card footer → **Delete post** → inline confirm ("Delete this post? It will be removed from the wall for everyone.") → Cancel / Delete → toast "Post deleted". It disappears live for everyone.
-- "Mine" = created from this device (no logins). The app remembers the post ids on the device; the server deletes only if the request's device id matches the post's stored `device_id`. Clearing browser data means you can no longer delete those posts (admin still can).
+**Deleting posts**
+- **Every post** has a **⋮ (kebab) menu** in the card footer → **Delete post** → inline confirm ("Delete this post? It will be removed from the wall for everyone.") → Cancel / Delete → toast "Post deleted". It disappears live for everyone.
+- No logins and no ownership: anyone can delete any post. People on the wall are just the X accounts that shared posts.
+- Delete is a **soft delete** (the post is hidden, not erased), so admin can restore it from Moderate → Unhide if something is deleted by mistake or abuse. The server function will rate-limit deletes per device and record who deleted what.
 
 **After posting**
 - The sheet closes, a toast says **"Post is being added to the wall"**, and you're taken to the wall (the feed, scrolled to the top, where your post appears). No success screen.
@@ -354,6 +355,10 @@ votes (post_id uuid references posts, device_id text, primary key (post_id, devi
 ## 7. Change log
 
 Newest first. The sections above always describe the current product; this log records what changed and why.
+
+### 2026-10-15 — Delete on every post
+- The ⋮ → Delete option is now on **every** post, not just ones made from this device (no ownership, no logins). Delete hides the post from the wall for everyone; admin can restore it from Moderate.
+- Removed the "posts made on this device" tracking.
 
 ### 2026-10-15 — Delete own posts, calmer focus, roomier X embeds
 - **Delete:** posts made from this device get a ⋮ menu with **Delete post** and an inline confirmation; deletion removes it live everywhere (mock now; server function checks the device id when live).

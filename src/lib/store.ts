@@ -17,8 +17,9 @@ export interface Store {
   myVotes(): Promise<Set<string>>;
   setHidden(postId: string, hidden: boolean): Promise<void>;
   /**
-   * Deletes a post created on this device. Backend: an Edge Function that
-   * checks the device id matches the post's device_id before deleting.
+   * Removes a post from the wall for everyone. Anyone can delete any post (no
+   * logins). It's a soft delete (hidden), so admin can restore it from Moderate.
+   * Backend: an Edge Function that rate-limits deletes per device and records who deleted it.
    */
   deletePost(postId: string): Promise<void>;
   /** Records this device's visit; returns the unique visitor count. */
@@ -67,10 +68,6 @@ function write(key: string, value: unknown) {
         : "Couldn't save locally."
     );
   }
-}
-
-function readMinePosts(): string[] {
-  return read<string[]>("cbw:mine", []);
 }
 
 function createMockStore(): Store {
@@ -155,10 +152,12 @@ function createMockStore(): Store {
 
     async deletePost(postId) {
       await delay(150);
-      if (!readMinePosts().includes(postId)) throw new Error("You can only delete posts made from this device.");
-      save(all().filter((p) => p.id !== postId));
-      write(VOTES_KEY, read<string[]>(VOTES_KEY, []).filter((k) => !k.startsWith(`${postId}:`)));
-      emit({ kind: "delete", id: postId, fromThisTab: true });
+      const posts = all();
+      const post = posts.find((x) => x.id === postId);
+      if (!post) return;
+      post.hidden = true;
+      save(posts);
+      emit({ kind: "update", post, fromThisTab: true });
     },
 
     async recordVisit() {

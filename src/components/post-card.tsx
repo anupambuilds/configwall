@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { siteUrl } from "@/lib/config";
-import { forgetMyPost, useMyPostIds } from "@/lib/identity";
 import { metKey } from "@/lib/people";
 import { canPostToX, postToXUrl } from "@/lib/share";
 import { getStore } from "@/lib/store";
@@ -268,7 +267,6 @@ function CardFooter({
   showAuthor: boolean;
   viewOnX?: string | null;
 }) {
-  const mine = useMyPostIds().has(post.id);
   return (
     <footer className="mt-3 flex items-center gap-2 px-4 pb-3 text-xs text-muted">
       {showAuthor &&
@@ -294,13 +292,13 @@ function CardFooter({
         )}
         <ShareButton id={post.id} />
         <UpvoteButton post={post} voted={voted} onVoted={onVoted} />
-        {mine && <PostMenu postId={post.id} />}
+        <PostMenu postId={post.id} />
       </span>
     </footer>
   );
 }
 
-/** Kebab menu on posts made from this device: delete, with an inline confirm step. */
+/** Kebab menu on every post: delete (removes it from the wall), with an inline confirm step. */
 function PostMenu({ postId }: { postId: string }) {
   const { toast } = useShell();
   const [open, setOpen] = useState(false);
@@ -331,7 +329,6 @@ function PostMenu({ postId }: { postId: string }) {
     setBusy(true);
     try {
       await getStore().deletePost(postId);
-      forgetMyPost(postId);
       toast("Post deleted");
     } catch (e) {
       toast(e instanceof Error ? e.message : "Couldn't delete the post. Try again.");

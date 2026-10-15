@@ -87,7 +87,7 @@ Every field the forms collect has a column; `npm run check:schema` enforces it. 
 2. `create-post` server function: validation, tweet fetch + snapshot mapping (expand t.co, decode entities, long posts), dedupe, device id, rate limit, idempotency, field-level errors.
 3. Photo upload function (signed upload to the `photos` bucket).
 4. Admin server function with a secret (seed, quick add, hide/unhide + live removal broadcast).
-4b. `delete-post` server function: delete only when the caller's device id matches the post's `device_id`; votes cascade; broadcast the removal.
+4b. `delete-post` server function: anyone can delete any post; it sets `hidden` (soft delete, restorable by admin), records who deleted it and when, rate-limits deletes per device, and broadcasts the removal.
 5. Placeholders: real talk list, event hashtag, your X handle, admin secret.
 6. Mock seed data must never load outside local development.
 7. Repo public + GitHub Pages enabled; first CI deploy green (Linux build from a Windows-made lockfile is untested).
@@ -119,7 +119,7 @@ Every field the forms collect has a column; `npm run check:schema` enforces it. 
 - [ ] Every field typed appears on the card
 - [ ] Each form shows field errors for empty/too-long/invalid input; server rejections land on the right field
 - [ ] Upvote once per device; count updates on the other phone
-- [ ] ⋮ menu shows only on your own posts; Delete removes it on the other phone; another device can't delete it
+- [ ] ⋮ → Delete on any post removes it on the other phone; admin can restore it; rapid repeated deletes get rate-limited
 - [ ] Admin: seed, quick add, hide → disappears live elsewhere; admin unreachable without the secret
 - [ ] People: search, metrics, Config card PNG on iPhone and Android, share to X opens with the right link
 - [ ] Airplane mode mid-post → draft kept, retry works

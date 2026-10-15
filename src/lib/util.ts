@@ -97,7 +97,6 @@ export function validatePost(p: NewPost): string | null {
       } else {
         if (!body) return "Write your post.";
         if (body.length > MAX_BODY) return `Posts are capped at ${MAX_BODY} characters so they fit on X.`;
-        if (!p.author_handle) return "Add your X handle so the post is credited to you.";
       }
       break;
     case "met":

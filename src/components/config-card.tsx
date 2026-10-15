@@ -140,7 +140,7 @@ export function ConfigCardPanel({ person, posts, onClose }: { person: Person; po
             >
               <div className="flex items-center justify-between" style={{ fontSize: 26 }}>
                 <span className="font-semibold uppercase" style={{ letterSpacing: "0.16em" }}>
-                  My Config BLR
+                  Figma Config BLR Wall
                 </span>
                 <span className="rounded-full border-2 border-ink/20 font-medium text-muted uppercase" style={{ padding: "8px 20px", fontSize: 20, letterSpacing: "0.12em" }}>
                   Unofficial

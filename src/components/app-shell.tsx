@@ -156,7 +156,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <nav className="sticky top-0 z-30 border-b border-line/80 bg-paper/85 backdrop-blur-md">
         <div className="mx-auto flex h-14 max-w-6xl items-center gap-3 px-4">
           <Link href="/" className="shrink-0 font-serif text-lg leading-none tracking-tight sm:text-xl">
-            Config BLR Wall
+            Figma Config BLR Wall
           </Link>
           <span className="hidden rounded-full border border-ink/15 px-2 py-0.5 text-[10px] font-medium tracking-wider text-muted uppercase sm:inline">
             Unofficial
@@ -273,7 +273,7 @@ function SiteFooter() {
     <footer className="border-t border-line px-4 py-6 text-center text-sm text-muted">
       <p className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
         <span>
-          <span className="font-semibold text-ink tabular-nums">{visitors === null ? "…" : formatCount(visitors)}</span> visitors
+          <span className="font-semibold text-ink tabular-nums">{visitors === null ? "…" : formatCount(visitors)}</span> {visitors === 1 ? "visitor" : "visitors"}
         </span>
         <span aria-hidden>·</span>
         <a href={`https://x.com/${BUILDER_HANDLE}`} target="_blank" rel="noopener noreferrer" className="hover:text-ink hover:underline">
@@ -284,7 +284,15 @@ function SiteFooter() {
           Built with Claude Code
         </a>
       </p>
+      <p className="mt-2 text-xs">
+        Questions, or want something taken down?{" "}
+        <a href={`https://x.com/${BUILDER_HANDLE}`} target="_blank" rel="noopener noreferrer" className="font-medium text-ink underline underline-offset-2">
+          DM me on X
+        </a>
+        .
+      </p>
       <p className="mt-1 text-xs">Unofficial community project. Not affiliated with Figma.</p>
+      <p className="mt-1 text-xs">Privacy: we keep a random device ID for votes, deletes and spam protection. No accounts, no personal data.</p>
     </footer>
   );
 }

@@ -12,11 +12,9 @@ export const TALKS = [
 /** Label for takeaways not tied to one talk. */
 export const GENERAL_TALK_LABEL = "The event overall";
 
-// PLACEHOLDER — use the hashtag attendees are actually using.
-export const HASHTAG = "ConfigBLR";
 
 // Your X handle for the "built by" credit (without @).
-export const BUILDER_HANDLE = process.env.NEXT_PUBLIC_BUILDER_HANDLE || "yourhandle";
+export const BUILDER_HANDLE = process.env.NEXT_PUBLIC_BUILDER_HANDLE || "_anupambhowmick";
 
 export const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || "";
 

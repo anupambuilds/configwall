@@ -11,11 +11,11 @@ const instrument = Instrument_Serif({ variable: "--font-instrument", subsets: ["
 const fontVars = [geistSans, geistMono, instrument].map((f) => f.variable).join(" ");
 
 export const metadata: Metadata = {
-  title: "Config BLR Wall",
+  title: "Figma Config BLR Wall",
   description:
     "What Bangalore designers took away from Config. An unofficial community recap wall — posts, people met and talk notes.",
   openGraph: {
-    title: "Config BLR Wall",
+    title: "Figma Config BLR Wall",
     description: "What Bangalore designers took away from Config. Unofficial community recap.",
     type: "website",
   },

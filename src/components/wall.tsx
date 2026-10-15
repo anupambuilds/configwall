@@ -102,7 +102,7 @@ export function Wall() {
           Live · {loading ? "…" : `${formatCount(posts.length)} posts · ${formatCount(peopleCount)} people`}
         </p>
         <h1 className="font-serif text-[52px] leading-[0.95] tracking-[-0.02em] sm:text-[84px]">
-          Config BLR <em className="text-accent">Wall</em>
+          Figma Config BLR <em className="text-accent">Wall</em>
         </h1>
         <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-muted sm:text-base">
           What Bangalore designers took away from Config: the posts, the people, the talk notes.{" "}

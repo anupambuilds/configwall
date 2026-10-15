@@ -38,7 +38,7 @@ function SinglePost() {
         ) : (
           <>
             <PostCard post={post} voted={votes.has(post.id)} onVoted={add} />
-            <p className="mt-4 text-center text-sm text-muted">Featured on the Config BLR Wall, an unofficial community recap.</p>
+            <p className="mt-4 text-center text-sm text-muted">Featured on the Figma Config BLR Wall, an unofficial community recap.</p>
           </>
         )}
       </div>

@@ -374,6 +374,15 @@ votes (post_id uuid references posts, device_id text, primary key (post_id, devi
 
 Newest first. The sections above always describe the current product; this log records what changed and why.
 
+### 2026-10-15 — Launch decisions applied
+- Site name is now **Figma Config BLR Wall** (nav, title, header, Config card, share sheet).
+- Builder handle **@_anupambhowmick** (header credit and footer).
+- **No hashtag** is added to Post on X shares.
+- **Wall posts can be anonymous** (X handle optional); migration `0004_anonymous_wall_posts.sql`, applied to test.
+- Pasting a **LinkedIn post** link shows “LinkedIn posts aren’t supported yet” with **Write a post instead**.
+- Footer: “Questions, or want something taken down? **DM me on X**”, a privacy line about the device ID, and “1 visitor” singular.
+- Verified with headless screenshots at desktop (1280px) and true phone width (390px).
+
 ### 2026-10-15 — Toggle switch fixed
 - The admin bar switches collapsed because their track and knob were inline spans (size ignored). Rebuilt as a reusable `Toggle` (36×20 track, 16px knob, accessible `role="switch"`), verified with a headless screenshot in both themes and states.
 

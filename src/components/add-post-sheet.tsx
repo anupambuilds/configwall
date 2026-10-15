@@ -305,6 +305,14 @@ function PostForm({ initialKind, onPosted }: { initialKind?: PostKind; onPosted:
               <input type="url" inputMode="url" value={link} onChange={(e) => onLinkChange(e.target.value)} placeholder="https://x.com/you/status/…" className={inputCls} autoFocus />
             </Field>
           )}
+          {linkKind(normalizeLink(link)) === "linkedin" && (
+            <div role="alert" className="-mt-1 flex items-center gap-3 rounded-xl border border-line bg-card p-3 text-sm">
+              <span className="flex-1 text-muted">LinkedIn posts aren&apos;t supported yet.</span>
+              <button type="button" onClick={() => setMode("native")} className="shrink-0 rounded-full bg-ink px-3 py-1.5 text-xs font-semibold text-paper">
+                Write a post instead
+              </button>
+            </div>
+          )}
           {isBulk && (
             <p className="-mt-2 text-xs text-muted">
               {bulkLinks.length} links. Each one is fetched and added with the post type below; any already on the wall are skipped.
@@ -339,7 +347,7 @@ function PostForm({ initialKind, onPosted }: { initialKind?: PostKind; onPosted:
       </Field>
 
       {mode === "native" ? (
-        <Field label="Your X handle">
+        <Field label="Your X handle (optional)">
           <HandleInput value={handle} onChange={setHandle} placeholder="yourhandle" />
         </Field>
       ) : (

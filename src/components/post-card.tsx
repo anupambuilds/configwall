@@ -474,7 +474,7 @@ function ShareButton({ id }: { id: string }) {
     const url = siteUrl(`/p/?id=${id}`);
     try {
       if (navigator.share && matchMedia("(pointer: coarse)").matches) {
-        await navigator.share({ url, title: "Config BLR Wall" });
+        await navigator.share({ url, title: "Figma Config BLR Wall" });
         return;
       }
       await navigator.clipboard.writeText(url);

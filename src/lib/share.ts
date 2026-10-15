@@ -1,4 +1,4 @@
-import { HASHTAG, siteUrl } from "./config";
+import { siteUrl } from "./config";
 import type { Post } from "./types";
 
 function clip(text: string, max: number): string {
@@ -33,7 +33,8 @@ export function xTextFor(post: Post): string {
 }
 
 export function xIntentUrl(text: string, url: string): string {
-  const q = new URLSearchParams({ text, url, hashtags: HASHTAG });
+  // No hashtag added: posts carry whatever the author writes.
+  const q = new URLSearchParams({ text, url });
   return `https://x.com/intent/post?${q.toString()}`;
 }
 

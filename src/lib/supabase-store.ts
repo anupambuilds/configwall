@@ -31,16 +31,26 @@ export function createSupabaseStore(): Store {
     listeners.forEach((l) => l(e));
   }
 
+  /**
+   * Calls an Edge Function. Network failures and gateway errors (e.g. a cold
+   * start, which the browser reports as a CORS error) are retried twice. Safe
+   * for create-post because every submit carries an idempotency key.
+   */
   async function call<T>(name: string, body: Record<string, unknown>): Promise<T> {
-    let res: Response;
-    try {
-      res = await fetch(`${SUPABASE_URL}/functions/v1/${name}`, {
-        method: "POST",
-        headers: { apikey: SUPABASE_KEY, "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-    } catch {
-      throw new ApiError("Couldn't reach the wall. Check your connection and try again.", "offline");
+    const RETRY_DELAYS = [600, 1500];
+    let res: Response | null = null;
+    for (let attempt = 0; ; attempt++) {
+      try {
+        res = await fetch(`${SUPABASE_URL}/functions/v1/${name}`, {
+          method: "POST",
+          headers: { apikey: SUPABASE_KEY, "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        if (![502, 503, 504, 546].includes(res.status) || attempt >= RETRY_DELAYS.length) break;
+      } catch {
+        if (attempt >= RETRY_DELAYS.length) throw new ApiError("Couldn't reach the wall. Check your connection and try again.", "offline");
+      }
+      await new Promise((r) => setTimeout(r, RETRY_DELAYS[attempt]));
     }
     const json = await res.json().catch(() => ({}));
     if (!res.ok) {

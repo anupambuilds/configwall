@@ -94,9 +94,9 @@ jobs:
             cat > site/index.html <<'HTML'
           <!doctype html>
           <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-          <title>Config BLR Wall</title><meta name="robots" content="noindex">
+          <title>Figma Config BLR Wall</title><meta name="robots" content="noindex">
           <style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#f5f2ea;color:#161513;font:16px/1.5 system-ui,sans-serif;text-align:center;padding:24px}h1{font:400 48px/1 Georgia,serif;margin:0 0 12px}p{color:#6b665c;margin:0}</style>
-          </head><body><div><h1>Config BLR Wall</h1><p>Unofficial community recap wall. Coming soon.</p></div></body></html>
+          </head><body><div><h1>Figma Config BLR Wall</h1><p>Unofficial community recap wall. Coming soon.</p></div></body></html>
           HTML
           fi
           mkdir -p site/test

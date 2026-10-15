@@ -70,7 +70,7 @@ Two card families. **Every field entered at creation appears on the card.**
 - **Type tag** (Takeaway / Quote / Story / Photo / Review), colour per type; Review is grey.
 - Text with @mentions, #hashtags and links styled like X (quotes in large serif), a 1–4 photo grid like X's, "Tagged" people chips.
 - Footer: **View on X ↗** (X posts only), then engagement: 𝕏 post-to-X (wall posts only), copy link, upvote.
-- If the tweet's saved copy isn't available, the body falls back to X's official embed, lazy-loaded, still with the type tag and footer, with comfortable spacing above and below. If X doesn't load it within 10 s, a "View on X" card shows instead.
+- If the tweet's saved copy isn't available, the body falls back to X's official embed, lazy-loaded, still with the type tag and footer, with exactly 12px above and below the tweet. If X doesn't load it within 10 s, a "View on X" card shows instead.
 
 **Editorial card**: same layout in two colours.
 
@@ -360,6 +360,9 @@ votes (post_id uuid references posts, device_id text, primary key (post_id, devi
 ## 7. Change log
 
 Newest first. The sections above always describe the current product; this log records what changed and why.
+
+### 2026-10-15 — Exact spacing around embedded X posts
+- Embedded tweets now have exactly **12px** above (from the post-type tag) and **12px** below (to the footer). X’s own ~10px embed margin is zeroed so the gap no longer depends on X.
 
 ### 2026-10-15 — Duplicate tweet detection
 - Pasting a tweet that's already on the wall shows an "Already on the wall" flag with a link to the existing post, and blocks posting (checked on paste and again on submit). Duplicates are matched by tweet id across all link variants.

@@ -61,12 +61,11 @@ function XStyleCard({ post, voted, onVoted, fresh }: CardProps) {
       {isX && !t ? (
         // Snapshot unavailable → official embed.
         <div className="px-4 pt-4">
+          {/* Exactly 12px tag → tweet (mb-3) and tweet → footer (footer mt-3); X's own margin is zeroed in globals.css. */}
           <div className="mb-3">
             <KindPill kind={post.kind} />
           </div>
-          <div className="py-1">
-            <XEmbed url={post.link_url!} handle={post.author_handle} />
-          </div>
+          <XEmbed url={post.link_url!} handle={post.author_handle} />
         </div>
       ) : (
         <div className="px-4 pt-4">

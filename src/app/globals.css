@@ -85,6 +85,12 @@ select:focus-visible {
   outline: none;
 }
 
+/* X adds ~10px above and below its embed (inline style); cards control the spacing instead. */
+.x-embed > .twitter-tweet {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
 @keyframes slide-in {
   from {
     opacity: 0;

@@ -70,7 +70,7 @@ Two card families. **Every field entered at creation appears on the card.**
 - **Type tag** (Takeaway / Quote / Story / Photo / Review), colour per type; Review is grey.
 - Text with @mentions, #hashtags and links styled like X (quotes in large serif), a 1–4 photo grid like X's, "Tagged" people chips.
 - Footer: **View on X ↗** (X posts only), then engagement: 𝕏 post-to-X (wall posts only), copy link, upvote.
-- If the tweet's saved copy isn't available, the body falls back to X's official embed, lazy-loaded, still with the type tag and footer.
+- If the tweet's saved copy isn't available, the body falls back to X's official embed, lazy-loaded, still with the type tag and footer, with comfortable spacing above and below. If X doesn't load it within 10 s, a "View on X" card shows instead.
 
 **Editorial card**: same layout in two colours.
 
@@ -119,6 +119,10 @@ Required: name **or** X handle **or** LinkedIn, plus the conversation and your h
 - Your X handle is pre-filled from the device and saved after your first post.
 - Required-field validation, character counters, and a basic profanity / link-spam check.
 - twitter.com links are normalised to x.com.
+
+**Deleting your own posts**
+- Posts made from this device show a **⋮ (kebab) menu** in the card footer → **Delete post** → inline confirm ("Delete this post? It will be removed from the wall for everyone.") → Cancel / Delete → toast "Post deleted". It disappears live for everyone.
+- "Mine" = created from this device (no logins). The app remembers the post ids on the device; the server deletes only if the request's device id matches the post's stored `device_id`. Clearing browser data means you can no longer delete those posts (admin still can).
 
 **After posting**
 - The sheet closes, a toast says **"Post is being added to the wall"**, and you're taken to the wall (the feed, scrolled to the top, where your post appears). No success screen.
@@ -350,6 +354,11 @@ votes (post_id uuid references posts, device_id text, primary key (post_id, devi
 ## 7. Change log
 
 Newest first. The sections above always describe the current product; this log records what changed and why.
+
+### 2026-10-15 — Delete own posts, calmer focus, roomier X embeds
+- **Delete:** posts made from this device get a ⋮ menu with **Delete post** and an inline confirmation; deletion removes it live everywhere (mock now; server function checks the device id when live).
+- **Text fields:** focus now just darkens the field's border; the extra outline ring is gone (checkboxes, buttons and links keep the keyboard focus ring).
+- **Embedded X posts:** more space between the type tag, the tweet and the footer (removed the negative margins).
 
 ### 2026-10-15 — Footer: visitors, builder handle, Built with Claude Code
 - Site footer on every page (except admin): unique visitor count (one per device, via `record_visit` RPC; migration `0002_visits.sql`, applied to the test project only), the builder’s X handle, and “Built with Claude Code”.

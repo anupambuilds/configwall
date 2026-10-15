@@ -115,4 +115,6 @@ Changing the model? Update `types.ts`, `EMPTY_POST`, `db.ts`, a **new** migratio
 - Counters show exact numbers up to 100, then `100+`, `150+`, … (`formatCount`).
 - Primary colour near-black `#1c1b19` on off-white `#f5f2ea`; green "Live" dot; add cards tint grey on hover.
 - After posting: close the sheet, toast "Post is being added to the wall", go to the wall. Posting to X is the 𝕏 button on each card.
+- Own posts (created on this device, ids in localStorage `cbw:mine`) get a ⋮ menu with Delete (inline confirm). The server must verify `device_id` before deleting.
+- Text fields show focus by darkening their border only (no outline ring); don't add focus rings to inputs.
 - Use tokens (`bg-paper`, `text-ink`, `bg-met-bg`, …), never raw hex in components (exception: LinkedIn blue).

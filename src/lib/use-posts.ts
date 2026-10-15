@@ -27,6 +27,11 @@ export function usePosts(opts?: { includeHidden?: boolean; holdRemote?: boolean 
       .finally(() => alive && setLoading(false));
 
     const unsub = store.subscribe((e) => {
+      if (e.kind === "delete") {
+        setPosts((prev) => prev.filter((x) => x.id !== e.id));
+        setPending((q) => q.filter((x) => x.id !== e.id));
+        return;
+      }
       if (e.kind === "insert") {
         if (holdRemote && !e.fromThisTab) setPending((q) => [e.post, ...q]);
         else setPosts((prev) => [e.post, ...prev.filter((x) => x.id !== e.post.id)]);

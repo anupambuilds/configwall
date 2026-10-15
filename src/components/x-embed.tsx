@@ -105,7 +105,7 @@ export function XEmbed({ url, handle }: { url: string; handle: string | null }) 
       */}
       <div
         ref={target}
-        className={state === "done" ? "-my-2.5" : state === "failed" ? "hidden" : "pointer-events-none opacity-0"}
+        className={state === "done" ? "" : state === "failed" ? "hidden" : "pointer-events-none opacity-0"}
         aria-hidden={state !== "done"}
       />
       {loading && (

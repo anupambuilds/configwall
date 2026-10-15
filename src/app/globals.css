@@ -78,6 +78,12 @@ body {
   outline: 2px solid var(--ink);
   outline-offset: 2px;
 }
+/* Text fields show focus by darkening their own border (focus:border-ink), not with an extra outline. */
+input:not([type="checkbox"]):not([type="radio"]):focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: none;
+}
 
 @keyframes slide-in {
   from {

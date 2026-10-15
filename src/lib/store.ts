@@ -16,6 +16,11 @@ export interface Store {
   upvote(postId: string): Promise<boolean>;
   myVotes(): Promise<Set<string>>;
   setHidden(postId: string, hidden: boolean): Promise<void>;
+  /**
+   * Deletes a post created on this device. Backend: an Edge Function that
+   * checks the device id matches the post's device_id before deleting.
+   */
+  deletePost(postId: string): Promise<void>;
   /** Records this device's visit; returns the unique visitor count. */
   recordVisit(): Promise<number>;
   /** Public URL for an uploaded (already compressed) photo. */
@@ -31,7 +36,8 @@ export interface Store {
 
 export type StoreEvent =
   | { kind: "insert"; post: Post; fromThisTab: boolean }
-  | { kind: "update"; post: Post; fromThisTab: boolean };
+  | { kind: "update"; post: Post; fromThisTab: boolean }
+  | { kind: "delete"; id: string; fromThisTab: boolean };
 
 // ---------------------------------------------------------------------------
 // Local mock: localStorage for persistence, BroadcastChannel to fake realtime
@@ -61,6 +67,10 @@ function write(key: string, value: unknown) {
         : "Couldn't save locally."
     );
   }
+}
+
+function readMinePosts(): string[] {
+  return read<string[]>("cbw:mine", []);
 }
 
 function createMockStore(): Store {
@@ -141,6 +151,14 @@ function createMockStore(): Store {
           .filter((k) => k.endsWith(`:${device}`))
           .map((k) => k.slice(0, k.lastIndexOf(":")))
       );
+    },
+
+    async deletePost(postId) {
+      await delay(150);
+      if (!readMinePosts().includes(postId)) throw new Error("You can only delete posts made from this device.");
+      save(all().filter((p) => p.id !== postId));
+      write(VOTES_KEY, read<string[]>(VOTES_KEY, []).filter((k) => !k.startsWith(`${postId}:`)));
+      emit({ kind: "delete", id: postId, fromThisTab: true });
     },
 
     async recordVisit() {

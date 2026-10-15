@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { siteUrl } from "@/lib/config";
+import { forgetMyPost, useMyPostIds } from "@/lib/identity";
 import { metKey } from "@/lib/people";
 import { canPostToX, postToXUrl } from "@/lib/share";
 import { getStore } from "@/lib/store";
@@ -60,11 +61,13 @@ function XStyleCard({ post, voted, onVoted, fresh }: CardProps) {
     <article className={cx("overflow-hidden rounded-2xl border border-line bg-surface", fresh && "animate-slide-in")}>
       {isX && !t ? (
         // Snapshot unavailable → official embed.
-        <div className="px-3 pt-3">
-          <div className="mb-2 px-1">
+        <div className="px-4 pt-4">
+          <div className="mb-3">
             <KindPill kind={post.kind} />
           </div>
-          <XEmbed url={post.link_url!} handle={post.author_handle} />
+          <div className="py-1">
+            <XEmbed url={post.link_url!} handle={post.author_handle} />
+          </div>
         </div>
       ) : (
         <div className="px-4 pt-4">
@@ -265,6 +268,7 @@ function CardFooter({
   showAuthor: boolean;
   viewOnX?: string | null;
 }) {
+  const mine = useMyPostIds().has(post.id);
   return (
     <footer className="mt-3 flex items-center gap-2 px-4 pb-3 text-xs text-muted">
       {showAuthor &&
@@ -290,8 +294,93 @@ function CardFooter({
         )}
         <ShareButton id={post.id} />
         <UpvoteButton post={post} voted={voted} onVoted={onVoted} />
+        {mine && <PostMenu postId={post.id} />}
       </span>
     </footer>
+  );
+}
+
+/** Kebab menu on posts made from this device: delete, with an inline confirm step. */
+function PostMenu({ postId }: { postId: string }) {
+  const { toast } = useShell();
+  const [open, setOpen] = useState(false);
+  const [confirming, setConfirming] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (e: PointerEvent) => {
+      if (!ref.current?.contains(e.target as Node)) close();
+    };
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && close();
+    document.addEventListener("pointerdown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  function close() {
+    setOpen(false);
+    setConfirming(false);
+  }
+
+  async function remove() {
+    setBusy(true);
+    try {
+      await getStore().deletePost(postId);
+      forgetMyPost(postId);
+      toast("Post deleted");
+    } catch (e) {
+      toast(e instanceof Error ? e.message : "Couldn't delete the post. Try again.");
+      setBusy(false);
+      close();
+    }
+  }
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => (open ? close() : setOpen(true))}
+        aria-label="More options"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        className="grid size-8 place-items-center rounded-full text-ink hover:bg-paper"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+          <circle cx="12" cy="5" r="1.8" />
+          <circle cx="12" cy="12" r="1.8" />
+          <circle cx="12" cy="19" r="1.8" />
+        </svg>
+      </button>
+      {open && (
+        <div role="menu" className="animate-fade-in absolute right-0 bottom-full z-20 mb-1 w-52 overflow-hidden rounded-xl border border-line bg-surface p-1 text-sm text-ink shadow-lg">
+          {!confirming ? (
+            <button role="menuitem" onClick={() => setConfirming(true)} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-danger hover:bg-ink/5">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" />
+              </svg>
+              Delete post
+            </button>
+          ) : (
+            <div className="p-2">
+              <p className="font-medium">Delete this post?</p>
+              <p className="mt-0.5 text-xs text-muted">It will be removed from the wall for everyone.</p>
+              <div className="mt-3 flex gap-2">
+                <button onClick={close} className="flex-1 rounded-full border border-line py-1.5 hover:bg-ink/5">
+                  Cancel
+                </button>
+                <button onClick={remove} disabled={busy} className="flex-1 rounded-full bg-danger py-1.5 font-semibold text-white disabled:opacity-60">
+                  {busy ? "Deleting…" : "Delete"}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
   );
 }
 

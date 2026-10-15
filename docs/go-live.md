@@ -87,6 +87,7 @@ Every field the forms collect has a column; `npm run check:schema` enforces it. 
 2. `create-post` server function: validation, tweet fetch + snapshot mapping (expand t.co, decode entities, long posts), dedupe, device id, rate limit, idempotency, field-level errors.
 3. Photo upload function (signed upload to the `photos` bucket).
 4. Admin server function with a secret (seed, quick add, hide/unhide + live removal broadcast).
+4b. `delete-post` server function: delete only when the caller's device id matches the post's `device_id`; votes cascade; broadcast the removal.
 5. Placeholders: real talk list, event hashtag, your X handle, admin secret.
 6. Mock seed data must never load outside local development.
 7. Repo public + GitHub Pages enabled; first CI deploy green (Linux build from a Windows-made lockfile is untested).
@@ -103,7 +104,7 @@ Every field the forms collect has a column; `npm run check:schema` enforces it. 
 |---|---|---|
 | 0 | You: make the repo public, enable Pages (GitHub Actions) | GitHub |
 | 1 | Supabase data layer in the app; tweet snapshot mapping; People uses tweet names | test DB, local + test site |
-| 2 | Server functions: create-post, upload-photo, admin (+ moderation broadcast) | test project |
+| 2 | Server functions: create-post, upload-photo, delete-post, admin (+ moderation broadcast) | test project |
 | 3 | Error handling: field errors, drafts, retries, rate-limit messages | test |
 | 4 | Launch polish: placeholders, noindex test site, favicon/OG, region decision | test |
 | 5 | Full test pass on the test site (checklist below), phone + two browsers | test |
@@ -118,6 +119,7 @@ Every field the forms collect has a column; `npm run check:schema` enforces it. 
 - [ ] Every field typed appears on the card
 - [ ] Each form shows field errors for empty/too-long/invalid input; server rejections land on the right field
 - [ ] Upvote once per device; count updates on the other phone
+- [ ] ⋮ menu shows only on your own posts; Delete removes it on the other phone; another device can't delete it
 - [ ] Admin: seed, quick add, hide → disappears live elsewhere; admin unreachable without the secret
 - [ ] People: search, metrics, Config card PNG on iPhone and Android, share to X opens with the right link
 - [ ] Airplane mode mid-post → draft kept, retry works

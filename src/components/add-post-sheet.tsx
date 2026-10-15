@@ -1,12 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { MAX_BODY, MAX_LONG, TALKS } from "@/lib/config";
 import { getMyHandle, setMyHandle } from "@/lib/identity";
 import { compressImage } from "@/lib/image";
-import { getStore } from "@/lib/store";
+import { DuplicatePostError, getStore } from "@/lib/store";
 import { EMPTY_POST, KIND_LABELS, MAX_MET_PHOTOS, POST_KINDS, type NewPost, type Post, type PostKind, type PostType, type TweetSnapshot } from "@/lib/types";
-import { cx, handleFromXUrl, linkKind, normalizeHandle, normalizeLink, parseHandles, validatePost } from "@/lib/util";
+import { cx, handleFromXUrl, linkKind, normalizeHandle, normalizeLink, parseHandles, timeAgo, validatePost } from "@/lib/util";
 import { XLogo } from "./icons";
 
 const SECTIONS: { type: PostType; label: string; hint: string; icon: React.ReactNode }[] = [
@@ -98,7 +99,12 @@ function useFormError(formKey: string) {
   return [state?.key === formKey ? state.msg : null, (msg: string) => setState({ msg, key: formKey })] as const;
 }
 
-async function submitDraft(draft: NewPost, setError: (m: string) => void, onPosted: (p: Post) => void): Promise<boolean> {
+async function submitDraft(
+  draft: NewPost,
+  setError: (m: string) => void,
+  onPosted: (p: Post) => void,
+  onDuplicate?: (existing: Post) => void
+): Promise<boolean> {
   const problem = validatePost(draft);
   if (problem) {
     setError(problem);
@@ -110,9 +116,32 @@ async function submitDraft(draft: NewPost, setError: (m: string) => void, onPost
     onPosted(post);
     return true;
   } catch (err) {
+    // Someone else may have shared it between the check and the submit.
+    if (err instanceof DuplicatePostError) onDuplicate?.(err.existing);
     setError(err instanceof Error ? err.message : "Something went wrong. Try again.");
     return false;
   }
+}
+
+/** Shown when the pasted tweet is already on the wall. */
+function DuplicateFlag({ post }: { post: Post }) {
+  const by = post.tweet?.author_handle ?? post.author_handle;
+  return (
+    <div role="alert" className="-mt-1 flex items-start gap-3 rounded-xl border border-danger/30 bg-danger/5 p-3 text-sm">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mt-0.5 shrink-0 text-danger" aria-hidden>
+        <path d="M4 22V4l8 3 8-3v11l-8 3-8-3" />
+      </svg>
+      <div className="min-w-0 flex-1">
+        <p className="font-semibold text-danger">Already on the wall</p>
+        <p className="text-muted">
+          This post{by ? ` by @${by}` : ""} was added {timeAgo(post.created_at)} ago. Each post can only be shared once.
+        </p>
+        <Link href={`/p/?id=${post.id}`} target="_blank" className="mt-1 inline-block font-medium text-ink underline underline-offset-2">
+          View it on the wall ↗
+        </Link>
+      </div>
+    </div>
+  );
 }
 
 function useMyHandleField() {
@@ -128,6 +157,7 @@ function PostForm({ initialKind, onPosted }: { initialKind?: PostKind; onPosted:
   const [link, setLink] = useState("");
   const [tweet, setTweet] = useState<TweetSnapshot | null>(null);
   const [fetchState, setFetchState] = useState<"idle" | "loading" | "done" | "failed">("idle");
+  const [duplicate, setDuplicate] = useState<Post | null>(null);
   const [kind, setKind] = useState<PostKind | null>(initialKind ?? null);
   const [body, setBody] = useState("");
   const [tagged, setTagged] = useState("");
@@ -143,6 +173,7 @@ function PostForm({ initialKind, onPosted }: { initialKind?: PostKind; onPosted:
   function onLinkChange(value: string) {
     setLink(value);
     setTweet(null);
+    setDuplicate(null);
     clearTimeout(timer.current);
     const url = normalizeLink(value);
     if (linkKind(url) !== "x" || !/\/status(es)?\/\d+/.test(url)) {
@@ -151,7 +182,9 @@ function PostForm({ initialKind, onPosted }: { initialKind?: PostKind; onPosted:
     }
     setFetchState("loading");
     timer.current = setTimeout(async () => {
-      const snap = await getStore().resolveTweet(url).catch(() => null);
+      const store = getStore();
+      const [dup, snap] = await Promise.all([store.findByTweet(url).catch(() => null), store.resolveTweet(url).catch(() => null)]);
+      setDuplicate(dup);
       setTweet(snap);
       setFetchState(snap ? "done" : "failed");
     }, 450);
@@ -163,6 +196,7 @@ function PostForm({ initialKind, onPosted }: { initialKind?: PostKind; onPosted:
     const native = mode === "native";
     const author = native ? normalizeHandle(handle) : tweet?.author_handle ?? linkHandle;
     if (native && handle.trim() && !author) return setError("Your X handle doesn't look right.");
+    if (!native && duplicate) return setError("This post is already on the wall.");
 
     setBusy(true);
     const ok = await submitDraft(
@@ -178,7 +212,8 @@ function PostForm({ initialKind, onPosted }: { initialKind?: PostKind; onPosted:
         tweet: native ? null : tweet,
       },
       setError,
-      onPosted
+      onPosted,
+      setDuplicate
     );
     if (!ok) setBusy(false);
   }
@@ -200,7 +235,8 @@ function PostForm({ initialKind, onPosted }: { initialKind?: PostKind; onPosted:
             <input type="url" inputMode="url" value={link} onChange={(e) => onLinkChange(e.target.value)} placeholder="https://x.com/you/status/…" className={inputCls} autoFocus />
           </Field>
           {fetchState === "loading" && <p className="-mt-2 animate-pulse text-xs text-muted">Fetching the post…</p>}
-          {fetchState === "done" && tweet && <TweetPreview tweet={tweet} />}
+          {duplicate && <DuplicateFlag post={duplicate} />}
+          {fetchState === "done" && tweet && !duplicate && <TweetPreview tweet={tweet} />}
           {fetchState === "failed" && (
             <p className="-mt-2 text-xs text-muted">Couldn&apos;t fetch a preview. It&apos;ll show as X&apos;s embedded post{linkHandle ? `, credited to @${linkHandle}` : ""}.</p>
           )}

@@ -3,6 +3,7 @@
 import { getDeviceId } from "./identity";
 import { buildMockSeed, MOCK_TWEETS } from "./mock-seed";
 import type { NewPost, Post, TweetSnapshot } from "./types";
+import { tweetIdFromUrl } from "./util";
 
 /**
  * Data layer. Everything the UI touches goes through this interface so the
@@ -11,7 +12,14 @@ import type { NewPost, Post, TweetSnapshot } from "./types";
 export interface Store {
   listPosts(opts?: { includeHidden?: boolean }): Promise<Post[]>;
   getPost(id: string): Promise<Post | null>;
+  /**
+   * Creates a post. For X posts, the tweet can only be on the wall once:
+   * throws DuplicatePostError if it's already visible; if it was deleted
+   * (hidden), the existing post is restored instead of creating a new one.
+   */
   createPost(p: NewPost, opts?: { isSeed?: boolean }): Promise<Post>;
+  /** The visible post already sharing this tweet, if any. */
+  findByTweet(url: string): Promise<Post | null>;
   /** Returns false when this device already voted. */
   upvote(postId: string): Promise<boolean>;
   myVotes(): Promise<Set<string>>;
@@ -33,6 +41,14 @@ export interface Store {
    */
   resolveTweet(url: string): Promise<TweetSnapshot | null>;
   subscribe(cb: (e: StoreEvent) => void): () => void;
+}
+
+/** Raised when a tweet that's already on the wall is shared again. */
+export class DuplicatePostError extends Error {
+  constructor(public existing: Post) {
+    super("This post is already on the wall.");
+    this.name = "DuplicatePostError";
+  }
 }
 
 export type StoreEvent =
@@ -106,6 +122,12 @@ function createMockStore(): Store {
       return all().filter((p) => opts?.includeHidden || !p.hidden);
     },
 
+    async findByTweet(url) {
+      const id = tweetIdFromUrl(url);
+      if (!id) return null;
+      return all().find((x) => !x.hidden && tweetIdFromUrl(x.link_url) === id) ?? null;
+    },
+
     async getPost(id) {
       await delay(60);
       return all().find((p) => p.id === id && !p.hidden) ?? null;
@@ -113,6 +135,19 @@ function createMockStore(): Store {
 
     async createPost(p, opts) {
       await delay(250);
+      const tweetId = p.type === "post" && p.source === "x" ? tweetIdFromUrl(p.link_url) : null;
+      if (tweetId) {
+        const posts = all();
+        const existing = posts.find((x) => tweetIdFromUrl(x.link_url) === tweetId);
+        if (existing && !existing.hidden) throw new DuplicatePostError(existing);
+        if (existing) {
+          // Deleted earlier: bring the original back rather than duplicating it.
+          Object.assign(existing, { hidden: false, kind: p.kind, tweet: p.tweet ?? existing.tweet });
+          save(posts);
+          emit({ kind: "update", post: existing, fromThisTab: true });
+          return existing;
+        }
+      }
       const post: Post = {
         ...p,
         id: crypto.randomUUID(),

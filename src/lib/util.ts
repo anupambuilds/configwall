@@ -55,6 +55,11 @@ export function normalizeLink(url: string): string {
   }
 }
 
+/** The tweet id from any X/Twitter status URL (the duplicate key). */
+export function tweetIdFromUrl(url: string | null | undefined): string | null {
+  return url?.match(/(?:^|\/\/|\.)(?:x|twitter)\.com\/[A-Za-z0-9_]{1,15}\/status(?:es)?\/(\d+)/i)?.[1] ?? null;
+}
+
 /** Try to read the author handle out of an X status URL. */
 export function handleFromXUrl(url: string): string | null {
   const m = url.match(/(?:x|twitter)\.com\/([A-Za-z0-9_]{1,15})\/status/i);

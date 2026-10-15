@@ -68,7 +68,7 @@ Every field the forms collect has a column; `npm run check:schema` enforces it. 
 | Collected | Column | Gap |
 |---|---|---|
 | Entry type, post type, source | `type`, `kind`, `source` | ✅ |
-| X link | `link_url` (canonical), `tweet_id` | ❌ server must parse `tweet_id` and dedupe (unique index exists) |
+| X link | `link_url` (canonical), `tweet_id` | ❌ server must parse `tweet_id`; on conflict with a **visible** post return a `duplicate` error with the existing post id (the form shows the flag); with a **hidden** post, un-hide it instead of inserting (unique index exists) |
 | Tweet preview | `tweet` | ❌ must be fetched **server-side** (browser preview can't be trusted or fetched) |
 | Wall post text, tagged | `body`, `tagged` | ✅ |
 | Met: name, designation, company, X, LinkedIn, conversation | `met_*`, `body` | ✅ |
@@ -114,7 +114,7 @@ Every field the forms collect has a column; `npm run check:schema` enforces it. 
 ## 6. Test checklist (step 5)
 - [ ] Feed loads < 2 s on mobile data with 40 posts
 - [ ] Paste a real tweet (text-only, with photos, with a long text, a reply, a deleted one, a protected one) → correct card or clear error
-- [ ] Same tweet twice → "Already on the wall"
+- [ ] Same tweet twice (also via twitter.com / ?s=20 / /photo/1 links) → "Already on the wall" flag with a working link; deleted tweet re-shared → original restored
 - [ ] Wall post, met card with 4 photos, talk notes → appear on a second phone within 2 s
 - [ ] Every field typed appears on the card
 - [ ] Each form shows field errors for empty/too-long/invalid input; server rejections land on the right field

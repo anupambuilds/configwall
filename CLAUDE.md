@@ -38,6 +38,9 @@ npm run dev          # http://localhost:3000 (uses .env.local → test Supabase)
 npm run dev:clean    # same, with a fresh .next/dev cache
 npm run build        # static export → out/
 npm run check:schema # every Post field has a DB column
+node scripts/e2e-backend.mjs <ref> <publishable-key>   # 35 backend checks (then run supabase/e2e-cleanup.sql)
+node scripts/e2e-realtime.mjs <ref> <publishable-key>  # live-update check
+node scripts/qa-ui.mjs [baseUrl]                       # 31 UI journeys in Edge (playwright-core)
 npx tsc --noEmit && npx eslint src
 ```
 Windows notes: in PowerShell use `npx.cmd` (script execution is disabled). In Git Bash, prefix builds that set a base path with `MSYS_NO_PATHCONV=1`, or `/configwall/test` gets rewritten to a Windows path.

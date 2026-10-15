@@ -375,6 +375,11 @@ votes (post_id uuid references posts, device_id text, primary key (post_id, devi
 
 Newest first. The sections above always describe the current product; this log records what changed and why.
 
+### 2026-10-16 — QA pass, retry fix, test site live
+- Added `scripts/qa-ui.mjs`: 31 real user journeys driven in Microsoft Edge (two browsers for live updates, admin mode, phone width). **31/31 pass** on local + test database.
+- QA found an intermittent blocked request (gateway cold start, reported by browsers as CORS). Server-function calls now **retry twice** on network/gateway errors; safe because every submit has an idempotency key.
+- GitHub Pages switched to **GitHub Actions** as the source; the **test site is live** at https://anupambuilds.github.io/configwall/test/.
+
 ### 2026-10-15 — Backend live: Mumbai projects, server functions, real data
 - Recreated both Supabase projects in **Mumbai** (`ap-south-1`): test `qhgbroeuqxdnybkryrfm`, production `grcvftfxgtqoiqzeevsv`. Migrations 0001–0006 applied to both.
 - **Server functions** (Edge Functions) for every write: create-post (validation, read-only, 10 posts / 10 min, double-submit protection, **X handle must exist**, server-side tweet fetch incl. **video**, one entry per tweet / restore deleted), resolve-tweet, delete-post (poster’s device or admin, 20 deletes / 10 min), upload-url (signed photo uploads), admin (verify, hide/restore, read-only, list hidden). Admin secret stored as a function secret.

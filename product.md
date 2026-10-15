@@ -219,6 +219,10 @@ Accounts or auth, comments, DMs, auto-pulling posts from X by hashtag, notificat
 
 ## 5. Tech requirements
 
+### Project links
+- Code: https://github.com/anupambuilds/configwall (public). GitHub Pages URL will be `https://anupambuilds.github.io/configwall/`, so `NEXT_PUBLIC_BASE_PATH=/configwall`.
+- Supabase project ref: `olmdpakuiawvtiolbhne` (API: `https://olmdpakuiawvtiolbhne.supabase.co`).
+
 ### Hosting: GitHub Pages (static)
 - **Next.js 16 (App Router) + TypeScript + Tailwind v4**, built with `output: "export"` into `out/`.
 - `basePath` comes from `NEXT_PUBLIC_BASE_PATH` (e.g. `/config-blr-wall` for a project site); `trailingSlash: true` so GitHub Pages serves `folder/index.html`.
@@ -330,7 +334,6 @@ votes (post_id uuid references posts, device_id text, primary key (post_id, devi
 - Real talk list + speaker names for the day (currently placeholders in `src/lib/config.ts`).
 - The event hashtag people are actually using (`HASHTAG` in `src/lib/config.ts`, placeholder `ConfigBLR`).
 - Builder handle for the credit line (`NEXT_PUBLIC_BUILDER_HANDLE`).
-- GitHub repo name → sets `NEXT_PUBLIC_BASE_PATH` and the public URL on the card.
 - Is "Config" in the product name OK, given the no-branding rule?
 - Talk notes: should they get photo upload too (e.g. photos of slides or notebooks)? Currently no; easy to add.
 
@@ -339,6 +342,9 @@ votes (post_id uuid references posts, device_id text, primary key (post_id, devi
 ## 7. Change log
 
 Newest first. The sections above always describe the current product; this log records what changed and why.
+
+### 2026-10-15 — Repo and Supabase project
+- Code pushed to https://github.com/anupambuilds/configwall; Supabase project `olmdpakuiawvtiolbhne` created. Site base path will be `/configwall`.
 
 ### 2026-10-15 — Card icon, no add on People, data contract + migration
 - People rows and the person view use a **card icon** for the Config card instead of the text label.

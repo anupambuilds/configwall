@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef } from "react";
-import { BUILDER_HANDLE, TALKS } from "@/lib/config";
+import { BUILDER_HANDLE, TALKS, talkSpeakers } from "@/lib/config";
 import { derivePeople } from "@/lib/people";
 import { KIND_LABELS, POST_KINDS, type Post, type PostKind, type PostType } from "@/lib/types";
 import { useMyVotes, usePosts } from "@/lib/use-posts";
@@ -220,7 +220,10 @@ export function Wall() {
             return (
               <section key={t} aria-label={t}>
                 <h2 className="mb-4 flex items-baseline gap-3 border-b border-line pb-2">
-                  <span className="font-serif text-3xl tracking-[-0.01em]">{t}</span>
+                  <span className="min-w-0">
+                    <span className="block font-serif text-3xl tracking-[-0.01em]">{t}</span>
+                    {talkSpeakers(t) && <span className="block text-sm text-muted">{talkSpeakers(t)}</span>}
+                  </span>
                   <span className="text-sm text-muted tabular-nums">
                     {group.length} note{group.length === 1 ? "" : "s"}
                   </span>

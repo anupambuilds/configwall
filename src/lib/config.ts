@@ -1,13 +1,36 @@
-// PLACEHOLDER talk list — replace with today's real schedule before launch.
-export const TALKS = [
-  "Opening keynote",
-  "Design systems at scale",
-  "AI in the design workflow",
-  "Prototyping & craft",
-  "Accessibility in practice",
-  "Building design teams in India",
-  "Closing panel",
+/**
+ * Config India, Oct 15 (Main Stage + Leadership Collective Lounge at BIEC), in
+ * schedule order. Source: config.figma.com/india/agenda/?day=2. The event is
+ * over, so titles won't change (renaming would split existing notes).
+ */
+export const TALK_LIST = [
+  { title: "Figma product keynote", speakers: "Dylan Field" },
+  { title: "Designing from India, thinking globally", speakers: "Arjun Singh, Animesh Mishra" },
+  { title: "The work has to leave the file", speakers: "Ashish Kashyap, Saptarshi Prakash" },
+  { title: "Figma Weave: What we keep in creative work and what we refuse to automate", speakers: "Ken Vreman" },
+  { title: "Designing for intelligent work: inside Microsoft Copilot's new chapter", speakers: "Parinishtha Yadav" },
+  { title: "When everyone can make anything, how far can we take it?", speakers: "Daisuke Sakai" },
+  { title: "Figma deep dive: Design together with code on the canvas", speakers: "Manish Kumar, Samantha Lee" },
+  { title: "Figma deep dive: Nothing lost in translation, from canvas to production", speakers: "Jake Albaugh, Megan Bednarczyk" },
+  { title: "Connecting public services by design", speakers: "Nav Pawera, Debabrata Nayak, Meghna Seshadri" },
+  { title: "Applied Insights: the hard thing about easy things", speakers: "Matt Walker, Viral Shah" },
+  { title: "An Eternal system of design", speakers: "Priyanka Srinivasagopalan" },
+  { title: "What changed when designers started shipping code", speakers: "Sascha Michael Trinkaus, Kaushal Cavale" },
+  { title: "Better together: from handoff to handshake", speakers: "Shahee Nannore Hiran, Rhish Neog" },
+  { title: "Taking stupid seriously", speakers: "Soren Iverson" },
+  { title: "What makes the House of Masaba feel like Masaba", speakers: "Masaba Gupta, Loredana Crisan" },
+  { title: "Parting thoughts", speakers: "Dylan Field" },
 ] as const;
+
+/** Talk titles (what's stored on notes). */
+export const TALKS = TALK_LIST.map((t) => t.title);
+
+const SPEAKERS: Record<string, string> = Object.fromEntries(TALK_LIST.map((t) => [t.title, t.speakers]));
+
+/** Speakers for a stored talk title ("" if unknown). */
+export function talkSpeakers(title: string | null | undefined): string {
+  return (title && SPEAKERS[title]) || "";
+}
 
 /** Label for takeaways not tied to one talk. */
 export const GENERAL_TALK_LABEL = "The event overall";

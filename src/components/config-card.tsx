@@ -109,7 +109,7 @@ export function ConfigCardPanel({ person, posts, onClose }: { person: Person; po
 
   function shareOnX() {
     const who = person.handle ? `@${person.handle}'s` : `${title}'s`;
-    const text = `${who} Config BLR in one card. Add yours:`;
+    const text = `${who} Figma Config BLR in one card. Add yours:`;
     window.open(xIntentUrl(text, siteUrl(`/people/?card=${encodeURIComponent(person.key)}`)), "_blank", "noopener");
   }
 

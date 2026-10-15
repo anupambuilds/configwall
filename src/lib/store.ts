@@ -1,9 +1,10 @@
 "use client";
 
-import { ADMIN_KEY, APP_ENV } from "./config";
+import { ADMIN_KEY, APP_ENV, SUPABASE_KEY, SUPABASE_URL } from "./config";
 import { getDeviceId, readMyPostIds } from "./identity";
 import { buildMockSeed, MOCK_TWEETS } from "./mock-seed";
 import type { NewPost, Post, TweetSnapshot } from "./types";
+import { createSupabaseStore } from "./supabase-store";
 import { tweetIdFromUrl } from "./util";
 
 /**
@@ -282,12 +283,12 @@ export function resetMockData() {
 }
 
 /** Where data actually comes from in this build (shown in the non-production banner). */
-export const DATA_SOURCE: "mock" | "supabase" = "mock";
+export const DATA_SOURCE: "mock" | "supabase" = SUPABASE_URL && SUPABASE_KEY ? "supabase" : "mock";
 
 let instance: Store | null = null;
 
 export function getStore(): Store {
-  // TODO(backend): return createSupabaseStore() when NEXT_PUBLIC_SUPABASE_URL is set.
-  instance ??= createMockStore();
+  // Real database when this build has Supabase settings; local mock data otherwise.
+  instance ??= DATA_SOURCE === "supabase" ? createSupabaseStore() : createMockStore();
   return instance;
 }

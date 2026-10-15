@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { siteUrl } from "@/lib/config";
+import { siteUrl, talkSpeakers } from "@/lib/config";
 import { forgetMyPost, useMyPostIds } from "@/lib/identity";
 import { metKey } from "@/lib/people";
 import { canPostToX, postToXUrl } from "@/lib/share";
@@ -78,6 +78,7 @@ function XStyleCard({ post, voted, onVoted, fresh }: CardProps) {
   const name = t?.author_name ?? null;
   const text = t?.text ?? post.body ?? "";
   const photos = t?.photos ?? [];
+  const videos = t?.videos ?? [];
   const tagged = isX ? t?.mentions ?? [] : post.tagged;
 
   return (
@@ -121,6 +122,16 @@ function XStyleCard({ post, voted, onVoted, fresh }: CardProps) {
             </p>
           )}
 
+          {videos.length > 0 && (
+            <video
+              src={videos[0].src}
+              poster={videos[0].poster}
+              controls
+              playsInline
+              preload="none"
+              className="mt-3 block max-h-[420px] w-full rounded-2xl border border-line bg-ink"
+            />
+          )}
           {photos.length > 0 && <PhotoGrid photos={photos} />}
 
           {tagged.length > 0 && (
@@ -263,7 +274,10 @@ function NoteCard({ post, voted, onVoted, fresh }: CardProps) {
     <article className={cx("overflow-hidden rounded-2xl border", tone.card, fresh && "animate-slide-in")}>
       <div className="flex flex-col gap-3 px-4 pt-4">
         <span className={cx("self-start rounded-full px-2 py-0.5 text-[11px] font-semibold tracking-wide text-ink/80 uppercase", tone.pill)}>Talk notes</span>
-        <p className="font-serif text-[22px] leading-[1.15] tracking-[-0.005em]">{post.talk}</p>
+        <div>
+          <p className="font-serif text-[22px] leading-[1.15] tracking-[-0.005em]">{post.talk}</p>
+          {talkSpeakers(post.talk) && <p className="mt-1 text-xs text-muted">{talkSpeakers(post.talk)}</p>}
+        </div>
         <div className={cx("border-t border-dashed pt-2.5", tone.rule)}>
           <Expandable text={post.body ?? ""} lines={7} className="text-[15px] leading-relaxed text-ink/85" />
         </div>

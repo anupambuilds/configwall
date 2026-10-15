@@ -18,7 +18,10 @@ export function timeAgo(iso: string, now = Date.now()): string {
   if (m < 60) return `${m}m`;
   const h = Math.round(m / 60);
   if (h < 24) return `${h}h`;
-  return `${Math.round(h / 24)}d`;
+  const d = Math.round(h / 24);
+  if (d < 30) return `${d}d`;
+  // Older than a month (e.g. an old tweet): show the date instead.
+  return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
 
 export type LinkKind = "x" | "linkedin";

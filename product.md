@@ -361,6 +361,9 @@ votes (post_id uuid references posts, device_id text, primary key (post_id, devi
 
 Newest first. The sections above always describe the current product; this log records what changed and why.
 
+### 2026-10-15 — Embedded X posts respect the card padding
+- X’s embed has a ~250px minimum width set inline, wider than a card’s content area in 3–4 column layouts, so it overflowed and hid the right padding. The embed is now forced to the card’s content width (and clipped if X still renders wider), keeping 16px padding on both sides.
+
 ### 2026-10-15 — Exact spacing around embedded X posts
 - Embedded tweets now have exactly **12px** above (from the post-type tag) and **12px** below (to the footer). X’s own ~10px embed margin is zeroed so the gap no longer depends on X.
 

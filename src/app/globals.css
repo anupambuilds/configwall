@@ -85,10 +85,22 @@ select:focus-visible {
   outline: none;
 }
 
-/* X adds ~10px above and below its embed (inline style); cards control the spacing instead. */
+/*
+ * X's embed sets its own margins and width inline (min ~250px, max 550px).
+ * Cards control spacing, and the embed must fit the card's content width so
+ * the card's right padding is never covered.
+ */
 .x-embed > .twitter-tweet {
   margin-top: 0 !important;
   margin-bottom: 0 !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+.x-embed iframe {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
 }
 
 @keyframes slide-in {

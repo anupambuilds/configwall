@@ -98,7 +98,7 @@ export function XEmbed({ url, handle }: { url: string; handle: string | null }) 
   const loading = (state === "idle" || state === "loading") && !!id;
 
   return (
-    <div ref={wrap} className="relative">
+    <div ref={wrap} className="relative min-w-0 overflow-hidden">
       {/*
         React never renders children here, so widgets.js can own this node.
         It must stay laid out (not display:none) while loading: X only reports

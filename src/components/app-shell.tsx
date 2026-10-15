@@ -9,6 +9,7 @@ import { DATA_SOURCE, getStore } from "@/lib/store";
 import type { Post, PostKind, PostType } from "@/lib/types";
 import { cx, formatCount } from "@/lib/util";
 import { AddPostSheet } from "./add-post-sheet";
+import { Toggle } from "./toggle";
 
 interface ToastMsg {
   id: number;
@@ -236,8 +237,9 @@ function AdminBar() {
     <div className="bg-ink text-paper">
       <div className="no-scrollbar mx-auto flex max-w-6xl items-center gap-2 overflow-x-auto px-4 py-2 text-[13px]">
         <span className="shrink-0 rounded-full bg-paper px-2 py-0.5 text-[11px] font-bold tracking-wide text-ink uppercase">Admin</span>
-        <Toggle label="Show hidden" on={showHidden} onChange={setShowHidden} />
+        <Toggle tone="dark" label="Show hidden" on={showHidden} onChange={setShowHidden} />
         <Toggle
+          tone="dark"
           label="Read-only"
           on={readOnly}
           disabled={busy}
@@ -252,23 +254,6 @@ function AdminBar() {
         </button>
       </div>
     </div>
-  );
-}
-
-function Toggle({ label, on, onChange, disabled }: { label: string; on: boolean; onChange: (on: boolean) => void; disabled?: boolean }) {
-  return (
-    <button
-      role="switch"
-      aria-checked={on}
-      disabled={disabled}
-      onClick={() => onChange(!on)}
-      className="flex shrink-0 items-center gap-2 rounded-full px-2 py-1 hover:bg-paper/10 disabled:opacity-50"
-    >
-      <span className={cx("relative h-4 w-7 rounded-full transition-colors", on ? "bg-live" : "bg-paper/30")}>
-        <span className={cx("absolute top-0.5 size-3 rounded-full bg-paper transition-transform", on ? "translate-x-3.5" : "translate-x-0.5")} />
-      </span>
-      {label}
-    </button>
   );
 }
 

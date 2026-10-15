@@ -374,6 +374,9 @@ votes (post_id uuid references posts, device_id text, primary key (post_id, devi
 
 Newest first. The sections above always describe the current product; this log records what changed and why.
 
+### 2026-10-15 — Toggle switch fixed
+- The admin bar switches collapsed because their track and knob were inline spans (size ignored). Rebuilt as a reusable `Toggle` (36×20 track, 16px knob, accessible `role="switch"`), verified with a headless screenshot in both themes and states.
+
 ### 2026-10-15 — Admin mode on the wall
 - Admin is now the **same wall with extra powers**, via a dark admin bar (ADMIN · Show hidden · Read-only · Lock): delete any post, see and **Unhide** hidden posts on the wall, paste **several X links at once** in the Post form, add talk notes **credited to any handle**, and a **read-only switch** that pauses posting/deleting for everyone else live.
 - `/admin/` is now just the unlock screen (and a short explainer once unlocked); the old back-office tabs are gone.

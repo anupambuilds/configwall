@@ -8,7 +8,8 @@
 export const POST_TYPES = ["post", "met", "note"] as const;
 export type PostType = (typeof POST_TYPES)[number];
 
-export const POST_KINDS = ["takeaway", "quote", "story", "photo", "review"] as const;
+// No "photo" type: photos belong to any post (they come from the tweet).
+export const POST_KINDS = ["takeaway", "quote", "story", "review"] as const;
 export type PostKind = (typeof POST_KINDS)[number];
 
 export type PostSource = "x" | "native";
@@ -91,7 +92,6 @@ export const KIND_LABELS: Record<PostKind, string> = {
   takeaway: "Takeaway",
   quote: "Quote",
   story: "Story",
-  photo: "Photo",
   review: "Review",
 };
 

@@ -67,7 +67,6 @@ const KIND_STYLE: Record<PostKind, string> = {
   takeaway: "bg-t-takeaway",
   quote: "bg-t-quote",
   story: "bg-t-story",
-  photo: "bg-t-photo",
   review: "bg-t-review",
 };
 

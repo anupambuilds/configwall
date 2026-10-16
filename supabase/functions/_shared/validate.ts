@@ -6,7 +6,7 @@ export const MAX_BODY = 280;
 export const MAX_LONG = 1000;
 export const MAX_PHOTOS = 4;
 export const POST_TYPES = ["post", "met", "note"] as const;
-export const POST_KINDS = ["takeaway", "quote", "story", "photo", "review"] as const;
+export const POST_KINDS = ["takeaway", "quote", "story", "review"] as const;
 
 export function normalizeHandle(raw: unknown): string | null {
   if (typeof raw !== "string" || !raw.trim()) return null;

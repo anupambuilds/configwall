@@ -49,7 +49,7 @@ The builder was not at the event, so the product is **online-first**: it pulls t
 - **Counters** (tab counts and the header’s posts/people): exact up to 100, then rounded down in steps of 50: 100+, 150+, 200+, 250+…
 - **Tabs** (each with a count): **All** · **Posts** · **People we met** · **Talk notes**.
   - **All**: everything mixed, newest first. No filters.
-  - **Posts**: sub-filters **All posts · Takeaways · Quotes · Stories · Photos · Reviews**. "Takeaway" is just a post type.
+  - **Posts**: sub-filters **All posts · Takeaways · Quotes · Stories · Reviews**. "Takeaway" is just a post type.
   - **People we met**: only met cards.
   - **Talk notes**: a mixed feed of all notes by default. A talk dropdown (default **All talks**) and a **Group by talk** toggle, which shows notes under each talk in schedule order; each group heading has the note count and "+ Add notes".
 - **Toolbar:** tabs and **Latest / Top** sit on one row (sort right-aligned; tabs scroll on small screens). The second row only appears for Posts (type sub-filters) and Talk notes (talk dropdown + Group by talk).
@@ -68,7 +68,7 @@ Two card families. **Every field entered at creation appears on the card.**
 
 **Post card**: one design for every post, whether from X or written on the wall.
 - Header: avatar, name, @handle, time. Top-right: the **X logo** (links to the tweet) for X posts, or a **"Wall post"** label for native posts.
-- **Type tag** (Takeaway / Quote / Story / Photo / Review), colour per type; Review is grey.
+- **Type tag** (Takeaway / Quote / Story / Review), colour per type; Review is grey.
 - Text with @mentions, #hashtags and links styled like X (quotes in large serif), a 1–4 photo grid like X's, "Tagged" people chips.
 - Footer: **View on X ↗** (X posts only), then engagement: 𝕏 post-to-X (wall posts only), copy link, upvote.
 - If the tweet's saved copy isn't available, the body falls back to X's official embed, lazy-loaded, still with the type tag and footer, with exactly 12px above and below the tweet. If X doesn't load it within 10 s, a "View on X" card shows instead.
@@ -92,7 +92,7 @@ Step 1 picks one of **three** sections, step 2 is a short form, step 3 is a succ
 | **Paste an X link** | X post URL → the post is fetched and previewed; the author handle is **auto-filled from the post** · post type | URL, type |
 | **Write a post** | text (280) · tag people (@handles) · post type · your X handle | text, type, your handle |
 
-Post types: **Takeaway · Quote · Story · Photo · Review**. Posts don't carry a talk.
+Post types: **Takeaway · Quote · Story · Review** (no separate Photo type: a tweet’s photos show on any post). Posts don't carry a talk.
 
 **Duplicate tweets.** A tweet can be on the wall only once. The duplicate key is the **tweet id**, so `twitter.com` vs `x.com`, `?s=20`, `/photo/1` and `mobile.` links all count as the same post.
 - As soon as a link is pasted, the form checks the wall. If it's already there, it shows a red **"Already on the wall"** flag ("This post by @handle was added 2h ago. Each post can only be shared once." + **View it on the wall ↗**) instead of the preview, and posting is blocked.
@@ -374,6 +374,10 @@ votes (post_id uuid references posts, device_id text, primary key (post_id, devi
 ## 7. Change log
 
 Newest first. The sections above always describe the current product; this log records what changed and why.
+
+### 2026-10-16 — Photo is no longer a post type
+- Removed the **Photo** type tag and the Posts › Photos filter: photos belong to takeaways, quotes, stories and reviews (they come from the tweet and still show on the card).
+- Server validation and the database (migration `0007_drop_photo_kind.sql`, applied to **test**) only accept takeaway, quote, story and review.
 
 ### 2026-10-16 — Production launch
 - `production` branch created from `main`: the public site https://anupambuilds.github.io/configwall/ now serves the real wall on the production database.

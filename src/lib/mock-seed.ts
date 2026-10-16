@@ -40,7 +40,7 @@ const t = (id: string) => MOCK_TWEETS[id];
 
 const seeds: Seed[] = [
   { mins: 3, type: "note", talk: "The work has to leave the file", body: "Design systems aren't a library, they're an agreement. The components are just the receipt.\n\nThree things to try on Monday:\n1. Write the contribution guide before the next component.\n2. Version tokens separately from components.\n3. Office hours > Slack threads.", author_handle: "demo_ananya", upvotes: 8 },
-  { mins: 5, type: "post", source: "x", kind: "photo", link_url: t("1000000000000000001").url, tweet: t("1000000000000000001"), author_handle: "demo_rahul" },
+  { mins: 5, type: "post", source: "x", kind: "story", link_url: t("1000000000000000001").url, tweet: t("1000000000000000001"), author_handle: "demo_rahul" },
   { mins: 8, type: "post", source: "x", kind: "quote", link_url: t("1000000000000000002").url, tweet: t("1000000000000000002"), author_handle: "demo_meera", upvotes: 14 },
   { mins: 11, type: "met", met_name: "Rahul", met_role: "Product Designer", met_company: "Demo Fintech", met_handle: "demo_rahul", met_linkedin: "https://www.linkedin.com/in/demo-rahul", body: "Talked about tokens in multi-brand apps and why naming is 80% of the work. He showed me their token audit spreadsheet — stealing that format.", photos: [pic("cbw-met-1", 1000, 750), pic("cbw-met-2", 900, 900), pic("cbw-met-3", 900, 900)], author_handle: "demo_ananya", upvotes: 6 },
   { mins: 14, type: "post", source: "native", kind: "story", body: "Asked a question in the AI session, got a follow-up chat at lunch with @demo_meera, now we're planning a meetup in Koramangala next month.", tagged: ["demo_meera"], author_handle: "demo_vikram" },
@@ -52,7 +52,7 @@ const seeds: Seed[] = [
   { mins: 41, type: "post", source: "x", kind: "review", link_url: t("1000000000000000006").url, tweet: t("1000000000000000006"), author_handle: "demo_karthik", upvotes: 6 },
   { mins: 46, type: "post", source: "native", kind: "takeaway", body: "The best design teams I met today write more than they draw. Docs are design too.", author_handle: "demo_karthik", upvotes: 7 },
   { mins: 52, type: "met", met_name: "Sana", met_role: "UX Researcher", met_company: "Demo Labs", met_handle: "demo_sana", body: "Met at the coffee line. Same bootcamp, five years apart. Talked about breaking into research from visual design.", author_handle: "demo_priya" },
-  { mins: 58, type: "post", source: "x", kind: "photo", link_url: t("1000000000000000004").url, tweet: t("1000000000000000004"), author_handle: "demo_ananya", upvotes: 15 },
+  { mins: 58, type: "post", source: "x", kind: "story", link_url: t("1000000000000000004").url, tweet: t("1000000000000000004"), author_handle: "demo_ananya", upvotes: 15 },
   { mins: 64, type: "post", source: "x", kind: "story", link_url: t("1000000000000000005").url, tweet: t("1000000000000000005"), author_handle: "demo_sana", upvotes: 18 },
   { mins: 70, type: "note", talk: "The work has to leave the file", body: "Ship the variable, not the hex code. Future-you will rebrand.", author_handle: "demo_rahul", upvotes: 3 },
   { mins: 74, type: "note", talk: "Figma product keynote", body: "- Craft is the sum of decisions nobody asked you to make\n- India has the fastest-growing designer community; mentoring is the bottleneck\n- Closing line: \"Make the thing you wish existed\"", author_handle: "demo_arjun" },

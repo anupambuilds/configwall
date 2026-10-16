@@ -4,7 +4,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef } from "react";
 import { BUILDER_HANDLE, TALKS, talkSpeakers } from "@/lib/config";
 import { derivePeople } from "@/lib/people";
-import { KIND_LABELS, POST_KINDS, type Post, type PostKind, type PostType } from "@/lib/types";
+import { KIND_LABELS, KIND_PLURALS, POST_KINDS, type Post, type PostKind, type PostType } from "@/lib/types";
 import { useMyVotes, usePosts } from "@/lib/use-posts";
 import { cx, formatCount } from "@/lib/util";
 import { AddCard } from "./add-card";
@@ -160,7 +160,7 @@ export function Wall() {
                       kind === k ? "border-ink bg-ink text-paper" : "border-line bg-card text-ink hover:border-ink/30"
                     )}
                   >
-                    {k ? `${KIND_LABELS[k]}s` : "All posts"}
+                    {k ? KIND_PLURALS[k] : "All posts"}
                   </button>
                 ))}
               </div>

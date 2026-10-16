@@ -378,6 +378,7 @@ Newest first. The sections above always describe the current product; this log r
 ### 2026-10-16 — Photo is no longer a post type
 - Removed the **Photo** type tag and the Posts › Photos filter: photos belong to takeaways, quotes, stories and reviews (they come from the tweet and still show on the card).
 - Server validation and the database (migration `0007_drop_photo_kind.sql`, applied to **test**) only accept takeaway, quote, story and review.
+- Fixed the Stories filter label, which read “Storys” (explicit plural labels now).
 
 ### 2026-10-16 — Production launch
 - `production` branch created from `main`: the public site https://anupambuilds.github.io/configwall/ now serves the real wall on the production database.

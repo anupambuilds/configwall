@@ -95,6 +95,14 @@ export const KIND_LABELS: Record<PostKind, string> = {
   review: "Review",
 };
 
+/** Plural labels for the Posts filters. */
+export const KIND_PLURALS: Record<PostKind, string> = {
+  takeaway: "Takeaways",
+  quote: "Quotes",
+  story: "Stories",
+  review: "Reviews",
+};
+
 export const TYPE_LABELS: Record<PostType, string> = {
   post: "Post",
   met: "People we met",
